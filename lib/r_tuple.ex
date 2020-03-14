@@ -1,6 +1,14 @@
 defmodule RayTracer.RTuple do
   defstruct [:values]
 
+  def sub(a, b) do
+    { x(a) - x(b), y(a) - y(b), z(a) - z(b), w(a) - w(b) } |> new
+  end
+
+  def add(a, b) do
+    { x(a) + x(b), y(a) + y(b), z(a) + z(b), w(a) + w(b) } |> new
+  end
+
   def point?(v) do
     v |> w == 1.0
   end
@@ -29,7 +37,7 @@ defmodule RayTracer.RTuple do
     v |> value_at(1)
   end
 
-  def y(v) do
+  def z(v) do
     v |> value_at(2)
   end
 

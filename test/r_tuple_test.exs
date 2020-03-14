@@ -34,4 +34,32 @@ defmodule RTupleTest do
   test "vector() creates tuples with w = 0.0" do
     assert RTuple.vector(4, -4, 3) |> RTuple.w == 0.0
   end
+
+  test "subtracting two points" do
+    t1 = RTuple.point(1, 2, 3.5)
+    t2 = RTuple.point(3, 2, 1.2)
+
+    assert RTuple.sub(t1, t2) == RTuple.vector(-2,  0, 2.3)
+  end
+
+  test "subtracting a vector from a point" do
+    t1 = RTuple.point(1, 2, 3.5)
+    t2 = RTuple.vector(3, 2, 1.2)
+
+    assert RTuple.sub(t1, t2) == RTuple.point(-2,  0, 2.3)
+  end
+
+  test "subtracting two vectors" do
+    t1 = RTuple.vector(1, 2, 3.5)
+    t2 = RTuple.vector(3, 2, 1.2)
+
+    assert RTuple.sub(t1, t2) == RTuple.vector(-2,  0, 2.3)
+  end
+
+  test "adding two tuples" do
+    t1 = RTuple.point(1, 2, 3.5)
+    t2 = RTuple.vector(3, 2, 1.2)
+
+    assert RTuple.add(t1, t2) == RTuple.point(4, 4, 4.7)
+    end
 end
