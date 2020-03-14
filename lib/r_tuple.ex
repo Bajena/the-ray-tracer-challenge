@@ -17,8 +17,12 @@ defmodule RayTracer.RTuple do
   end
 
   def mul(a, b) when is_number(b), do: mul(b, a)
-  def mul(scalar, b) do
-    {scalar * x(b), scalar * y(b), scalar * z(b), scalar * w(b)} |> new
+  def mul(scalar, a) do
+    {scalar * x(a), scalar * y(a), scalar * z(a), scalar * w(a)} |> new
+  end
+
+  def div(b, scalar) do
+    {x(b) / scalar, y(b) / scalar, z(b) / scalar, w(b) / scalar} |> new
   end
 
   def point?(v) do
