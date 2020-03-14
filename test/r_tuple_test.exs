@@ -68,4 +68,12 @@ defmodule RTupleTest do
 
     assert RTuple.negate(t) == RTuple.new({-1, -2, -3, -1})
   end
+
+  test "multiplying a tuple by a scalar" do
+    t = RTuple.new({1, 2, 3, 1})
+    e = RTuple.new({0.5, 1, 1.5, 0.5})
+
+    assert RTuple.mul(t, 0.5) == e
+    assert RTuple.mul(0.5, t) == e
+  end
 end

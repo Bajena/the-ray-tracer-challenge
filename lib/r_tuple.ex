@@ -16,6 +16,11 @@ defmodule RayTracer.RTuple do
     {-x(a), -y(a), -z(a), -w(a)} |> new
   end
 
+  def mul(a, b) when is_number(b), do: mul(b, a)
+  def mul(scalar, b) do
+    {scalar * x(b), scalar * y(b), scalar * z(b), scalar * w(b)} |> new
+  end
+
   def point?(v) do
     v |> w == 1.0
   end
