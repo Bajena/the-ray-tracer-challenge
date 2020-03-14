@@ -4,25 +4,25 @@ defmodule RTupleTest do
   doctest RayTracer.RTuple
 
   test "a tuple with w = 1.0 is a point" do
-    res = { 4.3, -4.2, 3.1, 1.0 } |> RTuple.new |> RTuple.point?
+    res = {4.3, -4.2, 3.1, 1.0} |> RTuple.new |> RTuple.point?
 
     assert(res)
   end
 
   test "a tuple with w = 0.0 is not a point" do
-    res = { 4.3, -4.2, 3.1, 0.0 } |> RTuple.new |> RTuple.point?
+    res = {4.3, -4.2, 3.1, 0.0} |> RTuple.new |> RTuple.point?
 
     assert(!res)
   end
 
   test "a tuple with w = 1.0 is not a vector" do
-    res = { 4.3, -4.2, 3.1, 1.0 } |> RTuple.new |> RTuple.vector?
+    res = {4.3, -4.2, 3.1, 1.0} |> RTuple.new |> RTuple.vector?
 
     assert(!res)
   end
 
   test "a tuple with w = 0.0 is a vector" do
-    res = { 4.3, -4.2, 3.1, 0.0 } |> RTuple.new |> RTuple.vector?
+    res = {4.3, -4.2, 3.1, 0.0} |> RTuple.new |> RTuple.vector?
 
     assert(res)
   end
@@ -61,5 +61,5 @@ defmodule RTupleTest do
     t2 = RTuple.vector(3, 2, 1.2)
 
     assert RTuple.add(t1, t2) == RTuple.point(4, 4, 4.7)
-    end
+  end
 end

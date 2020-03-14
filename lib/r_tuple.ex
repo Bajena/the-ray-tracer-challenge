@@ -1,12 +1,15 @@
 defmodule RayTracer.RTuple do
+  @moduledoc """
+  This module wraps basic vector/point operations
+  """
   defstruct [:values]
 
   def sub(a, b) do
-    { x(a) - x(b), y(a) - y(b), z(a) - z(b), w(a) - w(b) } |> new
+    {x(a) - x(b), y(a) - y(b), z(a) - z(b), w(a) - w(b)} |> new
   end
 
   def add(a, b) do
-    { x(a) + x(b), y(a) + y(b), z(a) + z(b), w(a) + w(b) } |> new
+    {x(a) + x(b), y(a) + y(b), z(a) + z(b), w(a) + w(b)} |> new
   end
 
   def point?(v) do
@@ -22,11 +25,11 @@ defmodule RayTracer.RTuple do
   end
 
   def point(x, y, z) do
-    { x, y, z, 1.0 } |> new
+    {x, y, z, 1.0} |> new
   end
 
   def vector(x, y, z) do
-    { x, y, z, 0.0 } |> new
+    {x, y, z, 0.0} |> new
   end
 
   def x(v) do
