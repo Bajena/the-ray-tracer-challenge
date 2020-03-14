@@ -62,4 +62,10 @@ defmodule RTupleTest do
 
     assert RTuple.add(t1, t2) == RTuple.point(4, 4, 4.7)
   end
+
+  test "negating a tuple" do
+    t = RTuple.new({1, 2, 3, 1})
+
+    assert RTuple.negate(t) == RTuple.new({-1, -2, -3, -1})
+  end
 end

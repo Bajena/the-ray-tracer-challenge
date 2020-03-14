@@ -12,6 +12,10 @@ defmodule RayTracer.RTuple do
     {x(a) + x(b), y(a) + y(b), z(a) + z(b), w(a) + w(b)} |> new
   end
 
+  def negate(a) do
+    {-x(a), -y(a), -z(a), -w(a)} |> new
+  end
+
   def point?(v) do
     v |> w == 1.0
   end
