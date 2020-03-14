@@ -39,6 +39,14 @@ defmodule RayTracer.RTuple do
     zip_map(a, b, &(&1 * &2)) |> Enum.sum
   end
 
+  def cross(a, b) do
+    vector(
+      y(a) * z(b) - z(a) * y(b),
+      z(a) * x(b) - x(a) * z(b),
+      x(a) * y(b) - y(a) * x(b)
+    )
+  end
+
   def point?(v) do
     v |> w == 1.0
   end

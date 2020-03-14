@@ -107,4 +107,12 @@ defmodule RTupleTest do
     v2 = RTuple.vector(2, 3, 4)
     assert RTuple.dot(v1, v2) == 20
   end
+
+  test "cross product of two vectors" do
+    v1 = RTuple.vector(1, 2, 3)
+    v2 = RTuple.vector(2, 3, 4)
+
+    assert RTuple.cross(v1, v2) == RTuple.vector(-1, 2, -1)
+    assert RTuple.cross(v2, v1) == RTuple.vector(1, -2, 1)
+  end
 end
