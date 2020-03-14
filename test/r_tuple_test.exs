@@ -101,4 +101,10 @@ defmodule RTupleTest do
 
     assert n |> RTuple.magnitude == 1
   end
+
+  test "dot product of two vectors" do
+    v1 = RTuple.vector(1, 2, 3)
+    v2 = RTuple.vector(2, 3, 4)
+    assert RTuple.dot(v1, v2) == 20
+  end
 end

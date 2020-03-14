@@ -4,35 +4,39 @@ defmodule RayTracer.RTuple do
   """
   defstruct [values: {}]
 
-  def sub(%{values: v1}, %{values: v2}) do
-    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2)) |> Enum.map(fn {a, b} -> a - b end) |> new
+  def sub(a, b) do
+    zip_map(a, b, &(&1 - &2)) |> new
   end
 
-  def add(%{values: v1}, %{values: v2}) do
-    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2)) |> Enum.map(fn {a, b} -> a + b end) |> new
+  def add(a, b) do
+    zip_map(a, b, &(&1 + &2)) |> new
   end
 
-  def negate(%{values: v}) do
-    Tuple.to_list(v) |> Enum.map(&(-&1)) |> new
+  def negate(a) do
+    a |> map(&(-&1)) |> new
   end
 
   def mul(a, b) when is_number(b), do: mul(b, a)
-  def mul(scalar, %{values: v}) do
-    Tuple.to_list(v) |> Enum.map(&(&1 * scalar)) |> new
+  def mul(scalar, a) do
+    a |> map(&(&1 * scalar)) |> new
   end
 
-  def div(%{values: v}, scalar) do
-    Tuple.to_list(v) |> Enum.map(&(&1 / scalar)) |> new
+  def div(a, scalar) do
+    a |> map(&(&1 / scalar)) |> new
   end
 
   def length(a), do: magnitude(a)
-  def magnitude(%{values: v}) do
-    Tuple.to_list(v) |> Enum.map(&(&1 * &1)) |> Enum.sum |> :math.sqrt
+  def magnitude(a) do
+    a |> map(&(&1 * &1)) |> Enum.sum |> :math.sqrt
   end
 
   def normalize(v) do
     m = magnitude(v)
-    Tuple.to_list(v.values) |> Enum.map(&(&1 / m)) |> new
+    v |> map(&(&1 / m)) |> new
+  end
+
+  def dot(a, b) do
+    zip_map(a, b, &(&1 * &2)) |> Enum.sum
   end
 
   def point?(v) do
@@ -74,5 +78,14 @@ defmodule RayTracer.RTuple do
 
   defp value_at(%{values: v}, index) do
     v |> Kernel.elem(index)
+  end
+
+  defp zip_map(%{values: v1}, %{values: v2}, fun) do
+    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2))
+    |> Enum.map(fn {x,y} -> fun.(x, y) end)
+  end
+
+  defp map(%{values: v}, fun) do
+    Tuple.to_list(v) |> Enum.map(fun)
   end
 end
