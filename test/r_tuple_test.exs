@@ -91,4 +91,14 @@ defmodule RTupleTest do
     assert RTuple.vector(-1, -2, -3) |> RTuple.length == :math.sqrt(14)
     assert RTuple.vector(1, 2, 3) |> RTuple.length == :math.sqrt(14)
   end
+
+  test "normalization of a vector" do
+    s = :math.sqrt(14)
+    assert RTuple.vector(4, 0, 0) |> RTuple.normalize == RTuple.vector(1, 0, 0)
+
+    n = RTuple.vector(1, 2, 3) |> RTuple.normalize
+    assert n == RTuple.vector(1 / s, 2 / s, 3 / s)
+
+    assert n |> RTuple.magnitude == 1
+  end
 end

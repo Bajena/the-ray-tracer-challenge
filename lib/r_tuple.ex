@@ -2,32 +2,37 @@ defmodule RayTracer.RTuple do
   @moduledoc """
   This module wraps basic vector/point operations
   """
-  defstruct [:values]
+  defstruct [values: {}]
 
-  def sub(a, b) do
-    {x(a) - x(b), y(a) - y(b), z(a) - z(b), w(a) - w(b)} |> new
+  def sub(%{values: v1}, %{values: v2}) do
+    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2)) |> Enum.map(fn {a, b} -> a - b end) |> new
   end
 
-  def add(a, b) do
-    {x(a) + x(b), y(a) + y(b), z(a) + z(b), w(a) + w(b)} |> new
+  def add(%{values: v1}, %{values: v2}) do
+    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2)) |> Enum.map(fn {a, b} -> a + b end) |> new
   end
 
-  def negate(a) do
-    {-x(a), -y(a), -z(a), -w(a)} |> new
+  def negate(%{values: v}) do
+    Tuple.to_list(v) |> Enum.map(&(-&1)) |> new
   end
 
   def mul(a, b) when is_number(b), do: mul(b, a)
-  def mul(scalar, a) do
-    {scalar * x(a), scalar * y(a), scalar * z(a), scalar * w(a)} |> new
+  def mul(scalar, %{values: v}) do
+    Tuple.to_list(v) |> Enum.map(&(&1 * scalar)) |> new
   end
 
-  def div(b, scalar) do
-    {x(b) / scalar, y(b) / scalar, z(b) / scalar, w(b) / scalar} |> new
+  def div(%{values: v}, scalar) do
+    Tuple.to_list(v) |> Enum.map(&(&1 / scalar)) |> new
   end
 
   def length(a), do: magnitude(a)
-  def magnitude(a) do
-    Tuple.to_list(a.values) |> Enum.map(fn x -> x * x end) |> Enum.sum |> :math.sqrt
+  def magnitude(%{values: v}) do
+    Tuple.to_list(v) |> Enum.map(&(&1 * &1)) |> Enum.sum |> :math.sqrt
+  end
+
+  def normalize(v) do
+    m = magnitude(v)
+    Tuple.to_list(v.values) |> Enum.map(&(&1 / m)) |> new
   end
 
   def point?(v) do
@@ -38,6 +43,7 @@ defmodule RayTracer.RTuple do
     v |> w == 0.0
   end
 
+  def new(values) when is_list(values), do: new(List.to_tuple(values))
   def new(values) do
     %{values: values}
   end
@@ -66,7 +72,7 @@ defmodule RayTracer.RTuple do
     v |> value_at(3)
   end
 
-  def value_at(v, index) do
-    v.values |> Kernel.elem(index)
+  defp value_at(%{values: v}, index) do
+    v |> Kernel.elem(index)
   end
 end
