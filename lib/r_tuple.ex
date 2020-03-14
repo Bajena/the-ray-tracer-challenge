@@ -25,6 +25,11 @@ defmodule RayTracer.RTuple do
     {x(b) / scalar, y(b) / scalar, z(b) / scalar, w(b) / scalar} |> new
   end
 
+  def length(a), do: magnitude(a)
+  def magnitude(a) do
+    Tuple.to_list(a.values) |> Enum.map(fn x -> x * x end) |> Enum.sum |> :math.sqrt
+  end
+
   def point?(v) do
     v |> w == 1.0
   end

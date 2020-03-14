@@ -83,4 +83,12 @@ defmodule RTupleTest do
 
     assert RTuple.div(t, 2) == e
   end
+
+  test "magnitude (length) of a vector" do
+    assert RTuple.vector(1, 0, 0) |> RTuple.magnitude == 1
+    assert RTuple.vector(0, 1, 0) |> RTuple.magnitude == 1
+    assert RTuple.vector(0, 0, 1) |> RTuple.magnitude == 1
+    assert RTuple.vector(-1, -2, -3) |> RTuple.length == :math.sqrt(14)
+    assert RTuple.vector(1, 2, 3) |> RTuple.length == :math.sqrt(14)
+  end
 end
