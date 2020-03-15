@@ -19,6 +19,6 @@ defmodule RayTracer.Color do
   Returns a new color - a multiplication of two input colors
   """
   def hadamard_product(c1, c2) do
-    RTuple.Helpers.zip_map(c1, c2, &(&1 * &2)) |> new
+    c1 |> RTuple.Helpers.zip_map(c2, &(&1 * &2)) |> new
   end
 end
