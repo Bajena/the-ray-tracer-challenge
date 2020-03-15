@@ -1,8 +1,42 @@
+defmodule RayTracer.RTuple.Helpers do
+  @moduledoc """
+  This module defines helpers for manipulating tuples
+  """
+
+  def zip_map(%{values: v1}, %{values: v2}, fun) do
+    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2))
+    |> Enum.map(fn {x, y} -> fun.(x, y) end)
+  end
+
+  def map(%{values: v}, fun) do
+    Tuple.to_list(v) |> Enum.map(fun)
+  end
+end
+
+defmodule RayTracer.RTuple.CustomOperators do
+  @moduledoc """
+  This module defines special operators required for tuple computations
+  """
+
+  import RayTracer.RTuple.Helpers
+
+  @doc """
+  Special comparison operator - returns true if all components of both tuples
+  are approximately equal (with 5 digits precision).
+  """
+  def a <~> b do
+    round = &(Float.round(&1, 5))
+    map(a, round) == map(b, round)
+  end
+end
+
 defmodule RayTracer.RTuple do
   @moduledoc """
   This module wraps basic vector/point operations
   """
   defstruct [values: {}]
+
+  import RayTracer.RTuple.Helpers
 
   def sub(a, b) do
     zip_map(a, b, &(&1 - &2)) |> new
@@ -16,8 +50,8 @@ defmodule RayTracer.RTuple do
     a |> map(&(-&1)) |> new
   end
 
-  def mul(a, b) when is_number(b), do: mul(b, a)
-  def mul(scalar, a) do
+  def mul(a, scalar) when is_number(scalar), do: mul(scalar, a)
+  def mul(scalar, a) when is_number(scalar) do
     a |> map(&(&1 * scalar)) |> new
   end
 
@@ -86,14 +120,5 @@ defmodule RayTracer.RTuple do
 
   defp value_at(%{values: v}, index) do
     v |> Kernel.elem(index)
-  end
-
-  defp zip_map(%{values: v1}, %{values: v2}, fun) do
-    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2))
-    |> Enum.map(fn {x,y} -> fun.(x, y) end)
-  end
-
-  defp map(%{values: v}, fun) do
-    Tuple.to_list(v) |> Enum.map(fun)
   end
 end
