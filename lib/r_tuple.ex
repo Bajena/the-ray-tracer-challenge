@@ -1,42 +1,9 @@
-defmodule RayTracer.RTuple.Helpers do
-  @moduledoc """
-  This module defines helpers for manipulating tuples
-  """
-
-  def zip_map(%{values: v1}, %{values: v2}, fun) do
-    Enum.zip(Tuple.to_list(v1), Tuple.to_list(v2))
-    |> Enum.map(fn {x, y} -> fun.(x, y) end)
-  end
-
-  def map(%{values: v}, fun) do
-    Tuple.to_list(v) |> Enum.map(fun)
-  end
-end
-
-defmodule RayTracer.RTuple.CustomOperators do
-  @moduledoc """
-  This module defines special operators required for tuple computations
-  """
-
-  import RayTracer.RTuple.Helpers
-
-  @doc """
-  Special comparison operator - returns true if all components of both tuples
-  are approximately equal (with 5 digits precision).
-  """
-  def a <~> b do
-    round = &(Float.round(&1, 5))
-    map(a, round) == map(b, round)
-  end
-end
-
 defmodule RayTracer.RTuple do
   @moduledoc """
   This module wraps basic vector/point operations
   """
 
-  import RayTracer.RTuple.Helpers
-  alias __MODULE__, as: RTuple
+  import __MODULE__.Helpers
 
   @type t :: %__MODULE__{
     values: tuple()
