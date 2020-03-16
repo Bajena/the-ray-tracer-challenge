@@ -55,7 +55,9 @@ defmodule RayTracer.RTuple do
 
   @spec dot(t, t) :: number
   def dot(a, b) do
-    zip_map(a, b, &(&1 * &2)) |> Enum.sum()
+    a
+    |> zip_map(b, &(&1 * &2))
+    |> Enum.sum()
   end
 
   @spec cross(t, t) :: t
