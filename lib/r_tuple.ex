@@ -13,12 +13,12 @@ defmodule RayTracer.RTuple do
 
   @spec sub(t, t) :: t
   def sub(a, b) do
-    zip_map(a, b, &(&1 - &2)) |> new
+    a |> zip_map(b, &(&1 - &2)) |> new
   end
 
   @spec add(t, t) :: t
   def add(a, b) do
-    zip_map(a, b, &(&1 + &2)) |> new
+    a |> zip_map(b, &(&1 + &2)) |> new
   end
 
   @spec negate(t) :: t
