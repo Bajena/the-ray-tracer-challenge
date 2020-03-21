@@ -230,4 +230,32 @@ defmodule MatrixTest do
     assert Matrix.cofactor(m, 0, 3) == 51
     assert Matrix.det(m) == -4071
   end
+
+  test "Testing an invertible matrix for invertibility" do
+    m =
+      """
+      |  6 |  4 |  4 |  4 |
+      |  5 |  5 |  7 |  6 |
+      |  4 | -9 |  3 | -7 |
+      |  9 |  1 |  7 | -6 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.det(m) == -2120
+    assert Matrix.invertible?(m)
+  end
+
+  test "Testing an noninvertible matrix for invertibility" do
+    m =
+      """
+      | -4 |  2 | -2 | -3 |
+      |  9 |  6 |  2 |  6 |
+      |  0 | -5 |  1 | -5 |
+      |  0 |  0 |  0 |  0 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.det(m) == 0
+    assert !Matrix.invertible?(m)
+  end
 end

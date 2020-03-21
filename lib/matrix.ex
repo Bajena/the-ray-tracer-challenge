@@ -247,6 +247,12 @@ defmodule RayTracer.Matrix do
     end
   end
 
+  @doc """
+    Checks if a matrix is invertible
+    """
+  @spec invertible?(matrix) :: boolean
+  def invertible?(m), do: det(m) != 0
+
 
   @doc """
     Returns a new matrix whose elements are the sum of the elements of
