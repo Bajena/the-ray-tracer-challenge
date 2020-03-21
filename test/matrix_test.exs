@@ -100,4 +100,26 @@ defmodule MatrixTest do
 
     assert Matrix.mult(m, t) == RTuple.new([18, 24, 33, 1])
   end
+
+  test "multiplying a matrix by an identity matrix" do
+    m1 =
+      """
+      | 0 | 1 |  2 |  4 |
+      | 1 | 2 |  4 |  8 |
+      | 2 | 4 |  8 | 16 |
+      | 4 | 8 | 16 | 32 |
+      """
+      |> Matrix.from_string
+
+    m2 = Matrix.ident(4)
+
+    assert Matrix.mult(m1, m2) == m1
+  end
+
+  test "Multiplying the identity matrix by a tuple" do
+    m = Matrix.ident(4)
+    t = RTuple.new([1, 2, 3, 4])
+
+    assert Matrix.mult(m, t) == t
+  end
 end
