@@ -122,4 +122,32 @@ defmodule MatrixTest do
 
     assert Matrix.mult(m, t) == t
   end
+
+  test "Transposing a matrix" do
+    m =
+      """
+      | 0 | 9 | 3 | 0 |
+      | 9 | 8 | 0 | 8 |
+      | 1 | 8 | 5 | 3 |
+      | 0 | 0 | 5 | 8 |
+      """
+      |> Matrix.from_string
+
+    t =
+      """
+      | 0 | 9 | 1 | 0 |
+      | 9 | 8 | 8 | 0 |
+      | 3 | 0 | 5 | 5 |
+      | 0 | 8 | 3 | 8 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.transpose(m) == t
+  end
+
+  test "Transposing an identity matrix" do
+    m = Matrix.ident(4)
+
+    assert Matrix.transpose(m) == m
+  end
 end
