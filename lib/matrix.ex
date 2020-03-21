@@ -194,6 +194,16 @@ defmodule RayTracer.Matrix do
   @doc """
     Returns the matrix with given row and column removed
     """
+  @spec minor(matrix, integer, integer) :: matrix
+  def minor(m, row, col) do
+    m
+    |> submatrix(row, col)
+    |> det
+  end
+
+  @doc """
+    Returns the matrix with given row and column removed
+    """
   @spec submatrix(matrix, integer, integer) :: matrix
   def submatrix(m, row, col) do
     m
@@ -236,8 +246,6 @@ defmodule RayTracer.Matrix do
   def add(x, y) do
     Enum.zip(x, y) |> Enum.map( fn({a,b})->add_rows(a,b) end )
   end
-
-
 
 
   @doc """

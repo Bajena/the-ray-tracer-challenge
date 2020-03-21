@@ -182,4 +182,19 @@ defmodule MatrixTest do
 
     assert Matrix.submatrix(m, 2, 1) == e
   end
+
+  test "Calculating a minor of a 3x3 matrix" do
+    m =
+      """
+      |  3 |  5 |  0 |
+      |  2 | -1 | -7 |
+      |  6 | -1 |  5 |
+      """
+      |> Matrix.from_string
+
+    b = Matrix.submatrix(m, 1, 0)
+
+    assert Matrix.det(b) == 25
+    assert Matrix.minor(m, 1, 0) == 25
+  end
 end
