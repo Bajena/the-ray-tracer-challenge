@@ -191,6 +191,30 @@ defmodule RayTracer.Matrix do
   end
 
 
+  @doc """
+    Returns the matrix with given row and column removed
+    """
+  @spec submatrix(matrix, integer, integer) :: matrix
+  def submatrix(m, row, col) do
+    m
+    |> List.delete_at(row)
+    |> Enum.map(&(List.delete_at(&1, col)))
+  end
+
+
+  @doc """
+    Computes a determinant of matrix
+    """
+  @spec det(matrix) :: number
+  def det(m) do
+    a = m |> elem(0,0)
+    b = m |> elem(0,1)
+    c = m |> elem(1,0)
+    d = m |> elem(1,1)
+
+    a * d - b * c
+  end
+
 
   @doc """
     Returns a new matrix whose elements are the sum of the elements of

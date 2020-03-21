@@ -150,4 +150,36 @@ defmodule MatrixTest do
 
     assert Matrix.transpose(m) == m
   end
+
+  test "Calculating the determinant of a 2x2 matrix" do
+    m =
+      """
+      |  1 | 5 |
+      | -3 | 2 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.det(m) == 17
+  end
+
+  test "A submatrix of a 4x4 matrix is a 3x3 matrix" do
+    m =
+      """
+      | -6 |  1 |  1 |  6 |
+      | -8 |  5 |  8 |  6 |
+      | -1 |  0 |  8 |  2 |
+      | -7 |  1 | -1 |  1 |
+      """
+      |> Matrix.from_string
+
+    e =
+      """
+      | -6 |  1 | 6 |
+      | -8 |  8 | 6 |
+      | -7 | -1 | 1 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.submatrix(m, 2, 1) == e
+  end
 end
