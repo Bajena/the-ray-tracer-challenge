@@ -194,7 +194,7 @@ defmodule RayTracer.Matrix do
   @doc """
     Returns a cofactor of a matrix at given row, col
     """
-  @spec cofactor(matrix, integer, integer) :: matrix
+  @spec cofactor(matrix, integer, integer) :: number
   def cofactor(m, row, col) do
     min = minor(m, row, col)
 
@@ -207,7 +207,7 @@ defmodule RayTracer.Matrix do
   @doc """
     Returns a minor of a matrix at given row,col
     """
-  @spec minor(matrix, integer, integer) :: matrix
+  @spec minor(matrix, integer, integer) :: number
   def minor(m, row, col) do
     m
     |> submatrix(row, col)
@@ -240,7 +240,7 @@ defmodule RayTracer.Matrix do
         d = m |> elem(1,1)
 
         a * d - b * c
-      _->
+      _ ->
         for col <- 0..(s-1) do
           elem(m, 0, col) * cofactor(m, 0, col)
         end |> Enum.sum
