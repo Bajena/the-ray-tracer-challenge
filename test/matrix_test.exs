@@ -1,5 +1,6 @@
 defmodule MatrixTest do
   alias RayTracer.Matrix
+  alias RayTracer.RTuple
   use ExUnit.Case
   doctest RayTracer.Matrix
 
@@ -83,5 +84,20 @@ defmodule MatrixTest do
       |> Matrix.from_string
 
     assert Matrix.mult(m1, m2) == m3
+  end
+
+  test "A matrix multiplied by a tuple" do
+    m =
+      """
+      | 1 | 2 | 3 | 4 |
+      | 2 | 4 | 4 | 2 |
+      | 8 | 6 | 4 | 1 |
+      | 0 | 0 | 0 | 1 |
+      """
+      |> Matrix.from_string
+
+    t = RTuple.new([1, 2, 3, 1])
+
+    assert Matrix.mult(m, t) == RTuple.new([18, 24, 33, 1])
   end
 end

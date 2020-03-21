@@ -1,4 +1,6 @@
 defmodule RayTracer.Matrix do
+  alias RayTracer.RTuple
+
   @moduledoc """
   *Matrix* is a linear algebra library for manipulating dense matrices. Its
   primary design goal is ease of use.  It is desirable that the *Matrix* package
@@ -235,7 +237,17 @@ defmodule RayTracer.Matrix do
     Enum.zip(x, y) |> Enum.map( fn({a,b})->subtract_rows(a,b) end )
   end
 
+  @spec from_r_tuple(RTuple.t) :: matrix
+  def from_r_tuple(%RayTracer.RTuple{values: values}) do
+    values
+    |> Tuple.to_list
+    |> Enum.map(&(make_row(1, &1)))
+  end
 
+  @spec mult(matrix, RTuple.t) :: RTuple.t
+  def mult(x, t = %RayTracer.RTuple{}) do
+    mult(x, from_r_tuple(t)) |> Enum.map(&Enum.at(&1, 0)) |> RTuple.new
+  end
 
   @doc """
     Returns a new matrix which is the linear algebra matrix multiply
