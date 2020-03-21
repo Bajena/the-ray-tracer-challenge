@@ -45,7 +45,7 @@ defmodule RayTracer.Matrix do
     """
   @spec new(integer, integer, number) :: matrix
   def new(rows, cols, val \\ 0) do
-    for _r <- 1..rows, do: make_row(cols,val)
+    for _r <- 1..rows, do: make_row(cols, val)
   end
 
   def make_row(0, _val), do: []
@@ -107,8 +107,8 @@ defmodule RayTracer.Matrix do
   def diag(d) do
     rows = length(d)
     Enum.zip( d, 0..rows-1 )
-    |> Enum.map(fn({v,s})->
-                  row = [v]++make_row(rows-1,0)
+    |> Enum.map(fn({v, s})->
+                  row = [v]++make_row(rows-1, 0)
                   rrotate(row, s)
                 end)
   end
@@ -133,7 +133,7 @@ defmodule RayTracer.Matrix do
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     """
   @spec ident(integer) :: matrix
-  def ident(rows), do: diag(make_row(rows,1))
+  def ident(rows), do: diag(make_row(rows, 1))
 
 
 
@@ -146,7 +146,7 @@ defmodule RayTracer.Matrix do
         iex> Matrix.size( Matrix.new(3,4) )
         {3, 4}
     """
-  @spec size(matrix) :: {integer,integer}
+  @spec size(matrix) :: {integer, integer}
   def size(x) do
     rows = length(x)
     cols = length( List.first(x) )
@@ -168,8 +168,8 @@ defmodule RayTracer.Matrix do
     """
   @spec set(matrix, integer, integer, number) :: matrix
   def set(x, row, col, val) do
-    row_vals = Enum.at(x,row)
-    new_row = List.replace_at(row_vals,col,val)
+    row_vals = Enum.at(x, row)
+    new_row = List.replace_at(row_vals, col, val)
     List.replace_at(x, row, new_row)
   end
 
@@ -186,7 +186,7 @@ defmodule RayTracer.Matrix do
     """
   @spec elem(matrix, integer, integer) :: number
   def elem(x, row, col, default \\ nil) do
-    row_vals = Enum.at(x,row,nil)
+    row_vals = Enum.at(x, row, nil)
     if row_vals == nil, do: default, else: Enum.at(row_vals, col, default)
   end
 
@@ -230,14 +230,14 @@ defmodule RayTracer.Matrix do
     """
   @spec det(matrix) :: number
   def det(m) do
-    {s,_} = size(m)
+    {s, _} = size(m)
 
     case s do
       2 ->
-        a = m |> elem(0,0)
-        b = m |> elem(0,1)
-        c = m |> elem(1,0)
-        d = m |> elem(1,1)
+        a = m |> elem(0, 0)
+        b = m |> elem(0, 1)
+        c = m |> elem(1, 0)
+        d = m |> elem(1, 1)
 
         a * d - b * c
       _ ->
@@ -261,7 +261,7 @@ defmodule RayTracer.Matrix do
   def inverse(m) do
     d = det(m)
 
-    {rows,cols} = size(m)
+    {rows, cols} = size(m)
     cofactors =
       for row <- 0..(rows - 1), do:
         for col <- 0..(cols - 1), do:
@@ -291,7 +291,7 @@ defmodule RayTracer.Matrix do
     """
   @spec add(matrix, matrix) :: matrix
   def add(x, y) do
-    Enum.zip(x, y) |> Enum.map( fn({a,b})->add_rows(a,b) end )
+    Enum.zip(x, y) |> Enum.map( fn({a, b})->add_rows(a, b) end )
   end
 
 
@@ -313,7 +313,7 @@ defmodule RayTracer.Matrix do
     """
   @spec sub(matrix, matrix) :: matrix
   def sub(x, y) do
-    Enum.zip(x, y) |> Enum.map( fn({a,b})->subtract_rows(a,b) end )
+    Enum.zip(x, y) |> Enum.map( fn({a, b})->subtract_rows(a, b) end )
   end
 
   @spec from_r_tuple(RTuple.t) :: matrix
@@ -344,8 +344,8 @@ defmodule RayTracer.Matrix do
   @spec mult(matrix, matrix) :: matrix
   def mult(x, y) do
 
-    {_rx,cx} = size(x)
-    {ry,_cy} = size(y)
+    {_rx, cx} = size(x)
+    {ry, _cy} = size(y)
     if (cx != ry), do:
       raise ArgumentError, message: "sizes incompatible"
 
@@ -397,8 +397,8 @@ defmodule RayTracer.Matrix do
   """
   @spec almost_equal?(matrix, matrix, number, number) :: boolean
   def almost_equal?(x, y, eps \\ @comparison_epsilon, max_ulp \\ @comparison_max_ulp) do
-    Enum.zip(x,y)
-    |> Enum.map(fn({r1,r2})->rows_almost_equal?(r1, r2, eps, max_ulp) end)
+    Enum.zip(x, y)
+    |> Enum.map(fn({r1, r2})->rows_almost_equal?(r1, r2, eps, max_ulp) end)
     |> Enum.all?
   end
 
@@ -414,7 +414,7 @@ defmodule RayTracer.Matrix do
   """
   @spec scale(matrix, number) :: matrix
   def scale(x, s) do
-    Enum.map(x, fn(r)->scale_row(r,s) end)
+    Enum.map(x, fn(r)->scale_row(r, s) end)
   end
 
 
@@ -433,14 +433,14 @@ defmodule RayTracer.Matrix do
   defp add_rows(r1, r2) do
     [h1|t1] = r1
     [h2|t2] = r2
-    [h1+h2] ++ add_rows(t1,t2)
+    [h1+h2] ++ add_rows(t1, t2)
   end
 
-  defp subtract_rows(r1, r2) when r1 == []  or  r2 == [], do: []
+  defp subtract_rows(r1, r2) when r1 == [] or r2 == [], do: []
   defp subtract_rows(r1, r2) do
     [h1|t1] = r1
     [h2|t2] = r2
-    [h1-h2] ++ subtract_rows(t1,t2)
+    [h1-h2] ++ subtract_rows(t1, t2)
   end
 
   #
@@ -455,8 +455,8 @@ defmodule RayTracer.Matrix do
   #
   # Compares two rows as being (approximately) equal.
   defp rows_almost_equal?(r1, r2, eps, max_ulp) do
-    x = Enum.zip(r1,r2)
-        |> Enum.map(fn({x,y})->close_enough?(x, y, eps, max_ulp) end)
+    x = Enum.zip(r1, r2)
+        |> Enum.map(fn({x, y})->close_enough?(x, y, eps, max_ulp) end)
     Enum.all?(x)
   end
 
