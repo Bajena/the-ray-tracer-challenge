@@ -323,6 +323,10 @@ defmodule RayTracer.Matrix do
     |> Enum.map(&(make_row(1, &1)))
   end
 
+  @doc """
+    Returns a new matrix which is a multiplication of a matrix `x` and a vector
+    (tuple) `t`.
+    """
   @spec mult(matrix, RTuple.t) :: RTuple.t
   def mult(x, t = %RayTracer.RTuple{}) do
     mult(x, from_r_tuple(t)) |> Enum.map(&Enum.at(&1, 0)) |> RTuple.new
@@ -378,52 +382,6 @@ defmodule RayTracer.Matrix do
   end
 
 
-
-
-  @doc """
-  Returns a new matrix which is the (linear algebra) inverse of the supplied
-  matrix.  If the supplied matrix is "x" then, by definition,
-          x * inv(x) = I
-  where I is the identity matrix. This function uses a brute force Gaussian
-  elimination so it is not expected to be terribly fast.
-  """
-  @spec inv(matrix) :: matrix
-  def inv(x) do
-    {rows,_cols} = size(x)
-    y = row_reduce( supplement(x,ident(rows)) )
-
-    {yl,yr} = desupplement(y)
-    z = supplement( full_flip(yl), full_flip(yr) )
-    {_,zzr} = desupplement( row_reduce(z) )
-    full_flip(zzr)
-  end
-
-
-
-  @doc """
-  Returns a new matrix whose elements are identical to the supplied matrix x
-  but with the supplied value appended to the beginning of each row.
-  #### See also
-  [postfix_row/2](#postfix_rows/2)
-  """
-  @spec prefix_rows(matrix, number) :: matrix
-  def prefix_rows(x, val) do
-    Enum.map(x, fn(r) -> [val]++r end)
-  end
-
-
-  @doc """
-  Returns a new matrix whose elements are identical to the supplied matrix x
-  but with the supplied value appended to the end of each row.
-  #### See also
-  [prefix_rows/2](#prefix_rows/2)
-  """
-  @spec postfix_rows(matrix, number) :: matrix
-  def postfix_rows(x, val) do
-    Enum.map(x, fn(r) -> r++[val] end)
-  end
-
-
   @doc """
   Compares two matrices as being (approximately) equal.  Since floating point
   numbers have slightly different representations and accuracies on different
@@ -464,8 +422,6 @@ defmodule RayTracer.Matrix do
   # Private supporting functions
   #################
 
-
-
   #
   # These functions apply a specific math operation to all the elements of the
   # supplied rows.  They are used by the math routine (e.g., add).  They call the
@@ -487,85 +443,12 @@ defmodule RayTracer.Matrix do
     [h1-h2] ++ subtract_rows(t1,t2)
   end
 
-
-  #
-  # Support function for matrix inverse.  "Supplement" the supplied matrix (x)
-  # by appending the matrix y to the right of it.  Generally used to make,
-  # for example,
-  #      x = |1 2|
-  #          |3 4|
-  # supplemented with the 2x2 identity matrix becomes
-  #      x = |1 2 1 0|
-  #          |3 4 0 1|
-  #
-  defp supplement([],y), do: y
-  defp supplement(x,y) do
-    Enum.zip(x,y)
-    |> Enum.map(fn({r1,r2}) -> r1++r2 end)
-  end
-
-  #
-  # Inverse of the "supplement" function.  This breaks the matrix apart into
-  # a left and right part - returned as a tuple.  For example for
-  #      x = |1 2 1 0|
-  #          |3 4 0 1|
-  # desupplement returns
-  #      { |1 2|   |1 0|
-  #        |3 4|   |0 1| }
-  #
-  defp desupplement(x) do
-    {_rows,cols} = size(x)
-    left = Enum.map(x, fn(r) -> elem(Enum.split(r,round(cols/2)),0) end)
-    right = Enum.map(x, fn(r) -> elem(Enum.split(r,round(cols/2)),1) end)
-    {left,right}
-  end
-
   #
   # Multiplies a row by a (scalar) constant.
   #
   defp scale_row(r, v) do
     Enum.map(r, fn(x) -> x * v end)
   end
-
-  #
-  # Uses elementary row operations to reduce the supplied matrix to row echelon
-  # form.  This is the first step of matrix inversion using Gaussian elimination.
-  #
-  defp row_reduce([]), do: []
-  defp row_reduce(rows) do
-    firsts = Enum.map(rows, fn(x) -> hd(x) end) # first element of each row
-    s = hd(firsts)
-    y = if abs(s)<1.0e-10 do
-          scale_row(hd(rows), 1)
-        else
-          scale_row(hd(rows), 1/s)
-        end
-
-    first_rest = Enum.map(tl(rows), fn(x) -> hd(x) end)
-    z = Enum.zip(tl(rows),first_rest)
-        |> Enum.map(fn({r,v}) ->
-                      if abs(v)<1.0e-10 do
-                        tl(r)
-                      else
-                        tl(subtract_rows(scale_row(r,1/v),y))
-                      end
-                    end)
-
-    [y] ++ prefix_rows(row_reduce(z), 0)
-  end
-
-  #
-  # Used in the "inv" function.  This function flips the supplied matrix top
-  # to bottom and left to right.  It is used after the first reduction to
-  # reduced echelon form to allow for recursive back substitution to get the
-  # inverse.
-  #
-  defp full_flip(x) do
-    Enum.reverse( Enum.map( x, fn(r)->Enum.reverse(r) end ) )
-  end
-
-
-
 
   #
   # The following functions are used for floating point comparison of matrices.
@@ -616,6 +499,4 @@ defmodule RayTracer.Matrix do
     <<int :: 64>> = <<x :: float>>
     int
   end
-
-
 end
