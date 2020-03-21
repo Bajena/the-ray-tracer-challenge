@@ -27,7 +27,7 @@ defmodule RayTracer.Matrix do
   @type row :: [number]
   @type matrix :: [row]
 
-  @comparison_epsilon 1.0e-12
+  @comparison_epsilon 1.0e-5
   @comparison_max_ulp 1
 
 
@@ -255,6 +255,25 @@ defmodule RayTracer.Matrix do
 
 
   @doc """
+    Calculates an inverse of matrix
+    """
+  @spec inverse(matrix) :: matrix
+  def inverse(m) do
+    d = det(m)
+
+    {rows,cols} = size(m)
+    cofactors =
+      for row <- 0..(rows - 1), do:
+        for col <- 0..(cols - 1), do:
+          cofactor(m, row, col)
+
+    cofactors
+    |> transpose
+    |> scale(1 / d)
+  end
+
+
+  @doc """
     Returns a new matrix whose elements are the sum of the elements of
     the provided matrices.  If the matrices are of differing sizes, the
     returned matrix will be the size and dimensions of the "overlap" between
@@ -410,18 +429,18 @@ defmodule RayTracer.Matrix do
   numbers have slightly different representations and accuracies on different
   architectures it is generally not a good idea to compare them directly.
   Rather numbers are considered equal if they are within an "epsilon" of each
-  other.  *almost_equal* compares all elements of two matrices, returning true
+  other.  *almost_equal?* compares all elements of two matrices, returning true
   if all elements are within the provided epsilon.
   #### Examples
-      iex> Matrix.almost_equal( [[1, 0], [0, 1]], [[1,0], [0,1+1.0e-12]] )
+      iex> Matrix.almost_equal?( [[1, 0], [0, 1]], [[1,0], [0,1+1.0e-5]] )
       false
-      iex> Matrix.almost_equal( [[1, 0], [0, 1]], [[1,0], [0,1+0.5e-12]] )
+      iex> Matrix.almost_equal?( [[1, 0], [0, 1]], [[1,0], [0,1+0.5e-5]] )
       true
   """
-  @spec almost_equal(matrix, matrix, number, number) :: boolean
-  def almost_equal(x, y, eps \\ @comparison_epsilon, max_ulp \\ @comparison_max_ulp) do
+  @spec almost_equal?(matrix, matrix, number, number) :: boolean
+  def almost_equal?(x, y, eps \\ @comparison_epsilon, max_ulp \\ @comparison_max_ulp) do
     Enum.zip(x,y)
-    |> Enum.map(fn({r1,r2})->rows_almost_equal(r1, r2, eps, max_ulp) end)
+    |> Enum.map(fn({r1,r2})->rows_almost_equal?(r1, r2, eps, max_ulp) end)
     |> Enum.all?
   end
 
@@ -552,7 +571,7 @@ defmodule RayTracer.Matrix do
   # The following functions are used for floating point comparison of matrices.
   #
   # Compares two rows as being (approximately) equal.
-  defp rows_almost_equal(r1, r2, eps, max_ulp) do
+  defp rows_almost_equal?(r1, r2, eps, max_ulp) do
     x = Enum.zip(r1,r2)
         |> Enum.map(fn({x,y})->close_enough?(x, y, eps, max_ulp) end)
     Enum.all?(x)

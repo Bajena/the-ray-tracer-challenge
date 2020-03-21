@@ -258,4 +258,53 @@ defmodule MatrixTest do
     assert Matrix.det(m) == 0
     assert !Matrix.invertible?(m)
   end
+
+  test "Calculating the inverse of a matrix" do
+    m =
+      """
+      | -5 |  2 |  6 | -8 |
+      |  1 | -5 |  1 |  8 |
+      |  7 |  7 | -6 | -7 |
+      |  1 | -3 |  7 |  4 |
+      """
+      |> Matrix.from_string
+
+    i =
+      """
+      |  0.21805 |  0.45113 |  0.24060 | -0.04511 |
+      | -0.80827 | -1.45677 | -0.44361 |  0.52068 |
+      | -0.07895 | -0.22368 | -0.05263 |  0.19737 |
+      | -0.52256 | -0.81391 | -0.30075 |  0.30639 |
+      """
+      |> Matrix.from_string
+
+    r = Matrix.inverse(m)
+
+    assert Matrix.almost_equal?(r, i)
+  end
+
+  test "Multiplying a product by its inverse" do
+    a =
+      """
+      |  3 | -9 |  7 |  3 |
+      |  3 | -8 |  2 | -9 |
+      | -4 |  4 |  4 |  1 |
+      | -6 |  5 | -1 |  1 |
+      """
+      |> Matrix.from_string
+
+    b =
+      """
+      |  8 |  2 |  2 |  2 |
+      |  3 | -1 |  7 |  0 |
+      |  7 |  0 |  5 |  4 |
+      |  6 | -2 |  0 |  5 |
+      """
+      |> Matrix.from_string
+
+    c = Matrix.mult(a, b)
+    i = Matrix.inverse(b)
+
+    assert Matrix.almost_equal?(Matrix.mult(c, i), a)
+  end
 end
