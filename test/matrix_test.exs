@@ -197,4 +197,37 @@ defmodule MatrixTest do
     assert Matrix.det(b) == 25
     assert Matrix.minor(m, 1, 0) == 25
   end
+
+  test "Calculating a cofactor of a 3x3 matrix" do
+    m =
+      """
+      |  3 |  5 |  0 |
+      |  2 | -1 | -7 |
+      |  6 | -1 |  5 |
+      """
+      |> Matrix.from_string
+
+    b = Matrix.submatrix(m, 1, 0)
+
+    assert Matrix.det(b) == 25
+    assert Matrix.minor(m, 1, 0) == 25
+    assert Matrix.cofactor(m, 1, 0) == -25
+  end
+
+  test "Calculating the determinant of a 4x4 matrix" do
+    m =
+      """
+      | -2 | -8 |  3 |  5 |
+      | -3 |  1 |  7 |  3 |
+      |  1 |  2 | -9 |  6 |
+      | -6 |  7 |  7 | -9 |
+      """
+      |> Matrix.from_string
+
+    assert Matrix.cofactor(m, 0, 0) == 690
+    assert Matrix.cofactor(m, 0, 1) == 447
+    assert Matrix.cofactor(m, 0, 2) == 210
+    assert Matrix.cofactor(m, 0, 3) == 51
+    assert Matrix.det(m) == -4071
+  end
 end

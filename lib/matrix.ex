@@ -192,7 +192,20 @@ defmodule RayTracer.Matrix do
 
 
   @doc """
-    Returns the matrix with given row and column removed
+    Returns a cofactor of a matrix at given row, col
+    """
+  @spec cofactor(matrix, integer, integer) :: matrix
+  def cofactor(m, row, col) do
+    min = minor(m, row, col)
+
+    case rem(row  + col, 2) do
+      0 -> min
+      1 -> -min
+    end
+  end
+
+  @doc """
+    Returns a minor of a matrix at given row,col
     """
   @spec minor(matrix, integer, integer) :: matrix
   def minor(m, row, col) do
@@ -217,12 +230,21 @@ defmodule RayTracer.Matrix do
     """
   @spec det(matrix) :: number
   def det(m) do
-    a = m |> elem(0,0)
-    b = m |> elem(0,1)
-    c = m |> elem(1,0)
-    d = m |> elem(1,1)
+    {s,_} = size(m)
 
-    a * d - b * c
+    case s do
+      2 ->
+        a = m |> elem(0,0)
+        b = m |> elem(0,1)
+        c = m |> elem(1,0)
+        d = m |> elem(1,1)
+
+        a * d - b * c
+      _->
+        for col <- 0..(s-1) do
+          elem(m, 0, col) * cofactor(m, 0, col)
+        end |> Enum.sum
+    end
   end
 
 
