@@ -1,7 +1,7 @@
 defmodule MatrixTest do
   alias RayTracer.Matrix
   use ExUnit.Case
-  # doctest RayTracer.Matrix
+  doctest RayTracer.Matrix
 
   test "constructing and inspecting a 4x4 matrix" do
     m =

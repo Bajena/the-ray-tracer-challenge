@@ -49,7 +49,7 @@ defmodule RayTracer.Matrix do
   def make_row(0, _val), do: []
   def make_row(n, val), do: [val] ++ make_row(n-1, val)
 
-  @spec from_string(string) :: matrix
+  @spec from_string(String.t) :: matrix
   def from_string(string) do
     string
     |> String.split("\n")
@@ -106,7 +106,7 @@ defmodule RayTracer.Matrix do
     rows = length(d)
     Enum.zip( d, 0..rows-1 )
     |> Enum.map(fn({v,s})->
-                  row = [v]++Matrix.make_row(rows-1,0)
+                  row = [v]++make_row(rows-1,0)
                   rrotate(row, s)
                 end)
   end
@@ -245,15 +245,6 @@ defmodule RayTracer.Matrix do
     xy is NxP.  If the number of columns of x does not equal the number of
     rows of y an `ArgumentError` exception is thrown with the message "sizes
     incompatible"
-    #### See also
-    [emult/2](#emult/2)
-    #### Examples
-        iex> Matrix.mult( Matrix.seq(2,2), Matrix.seq(2,2) )
-        [[7, 10], [15, 22]]
-        iex> Matrix.mult( Matrix.ones(3,2), Matrix.ones(2,3) )
-        [[2, 2, 2], [2, 2, 2], [2, 2, 2]]
-        iex> Matrix.mult( Matrix.ones(3,2), Matrix.ones(3,2) )
-        ** (ArgumentError) sizes incompatible
     """
   @spec mult(matrix, matrix) :: matrix
   def mult(x, y) do
@@ -282,9 +273,6 @@ defmodule RayTracer.Matrix do
     Returns a new matrix whose elements are the transpose of the supplied matrix.
     The transpose essentially swaps rows for columns - that is, the first row
     becomes the first column, the second row becomes the second column, etc.
-      #### Examples
-      iex> Matrix.transpose( Matrix.seq(3,2) )
-      [[1, 3, 5], [2, 4, 6]]
   """
   @spec transpose(matrix) :: matrix
   def transpose(m) do
@@ -305,13 +293,8 @@ defmodule RayTracer.Matrix do
   Returns a new matrix which is the (linear algebra) inverse of the supplied
   matrix.  If the supplied matrix is "x" then, by definition,
           x * inv(x) = I
-  where I is the identity matrix.  This function uses a brute force Gaussian
+  where I is the identity matrix. This function uses a brute force Gaussian
   elimination so it is not expected to be terribly fast.
-  #### Examples
-      iex> x = Matrix.rand(5,5)
-      iex> res = Matrix.mult( x, Matrix.inv(x) )
-      iex> Matrix.almost_equal(res,[[1,0,0],[0,1,0],[0,0,1]])
-      true
   """
   @spec inv(matrix) :: matrix
   def inv(x) do
@@ -331,9 +314,6 @@ defmodule RayTracer.Matrix do
   but with the supplied value appended to the beginning of each row.
   #### See also
   [postfix_row/2](#postfix_rows/2)
-  #### Examples
-      iex> Matrix.prefix_rows( Matrix.seq(2,2), 10 )
-      [[10, 1, 2], [10, 3, 4]]
   """
   @spec prefix_rows(matrix, number) :: matrix
   def prefix_rows(x, val) do
@@ -346,9 +326,6 @@ defmodule RayTracer.Matrix do
   but with the supplied value appended to the end of each row.
   #### See also
   [prefix_rows/2](#prefix_rows/2)
-  #### Examples
-      iex> Matrix.postfix_rows( Matrix.seq(2,2), 10 )
-      [[1, 2, 10], [3, 4, 10]]
   """
   @spec postfix_rows(matrix, number) :: matrix
   def postfix_rows(x, val) do
@@ -369,7 +346,7 @@ defmodule RayTracer.Matrix do
       iex> Matrix.almost_equal( [[1, 0], [0, 1]], [[1,0], [0,1+0.5e-12]] )
       true
   """
-  @spec almost_equal(matrix, matrix, number, number) :: matrix
+  @spec almost_equal(matrix, matrix, number, number) :: boolean
   def almost_equal(x, y, eps \\ @comparison_epsilon, max_ulp \\ @comparison_max_ulp) do
     Enum.zip(x,y)
     |> Enum.map(fn({r1,r2})->rows_almost_equal(r1, r2, eps, max_ulp) end)
@@ -418,14 +395,6 @@ defmodule RayTracer.Matrix do
     [h2|t2] = r2
     [h1-h2] ++ subtract_rows(t1,t2)
   end
-
-  defp emult_rows(r1, r2) when r1 == []  or  r2 == [], do: []
-  defp emult_rows(r1, r2) do
-    [h1|t1] = r1
-    [h2|t2] = r2
-    [h1*h2] ++ emult_rows(t1,t2)
-  end
-
 
 
   #
