@@ -106,7 +106,8 @@ defmodule RayTracer.Matrix do
   @spec diag([number]) :: matrix
   def diag(d) do
     rows = length(d)
-    Enum.zip( d, 0..rows-1 )
+    d
+    |> Enum.zip(0..rows-1)
     |> Enum.map(fn({v, s})->
                   row = [v]++make_row(rows-1, 0)
                   rrotate(row, s)
@@ -149,7 +150,7 @@ defmodule RayTracer.Matrix do
   @spec size(matrix) :: {integer, integer}
   def size(x) do
     rows = length(x)
-    cols = length( List.first(x) )
+    cols = length(List.first(x))
     {rows, cols}
   end
 
@@ -291,7 +292,7 @@ defmodule RayTracer.Matrix do
     """
   @spec add(matrix, matrix) :: matrix
   def add(x, y) do
-    Enum.zip(x, y) |> Enum.map( fn({a, b})->add_rows(a, b) end )
+    x |> Enum.zip(y) |> Enum.map(fn({a, b}) -> add_rows(a, b) end)
   end
 
 
@@ -313,7 +314,7 @@ defmodule RayTracer.Matrix do
     """
   @spec sub(matrix, matrix) :: matrix
   def sub(x, y) do
-    Enum.zip(x, y) |> Enum.map( fn({a, b})->subtract_rows(a, b) end )
+    Enum.zip(x, y) |> Enum.map(n({a, b}) -> subtract_rows(a, b) end)
   end
 
   @spec from_r_tuple(RTuple.t) :: matrix
@@ -329,7 +330,7 @@ defmodule RayTracer.Matrix do
     """
   @spec mult(matrix, RTuple.t) :: RTuple.t
   def mult(x, t = %RayTracer.RTuple{}) do
-    mult(x, from_r_tuple(t)) |> Enum.map(&Enum.at(&1, 0)) |> RTuple.new
+    x |> mult(from_r_tuple(t)) |> Enum.map(&Enum.at(&1, 0)) |> RTuple.new
   end
 
   @doc """
@@ -346,7 +347,7 @@ defmodule RayTracer.Matrix do
 
     {_rx, cx} = size(x)
     {ry, _cy} = size(y)
-    if (cx != ry), do:
+    if cx != ry, do:
       raise ArgumentError, message: "sizes incompatible"
 
     trans_y = transpose(y)
@@ -374,7 +375,7 @@ defmodule RayTracer.Matrix do
     swap_rows_cols(m)
   end
 
-  defp swap_rows_cols( [h|_t] ) when h==[], do: []
+  defp swap_rows_cols([h|_t]) when h==[], do: []
   defp swap_rows_cols(rows) do
     firsts = Enum.map(rows, fn(x) -> hd(x) end) # first element of each row
     rest = Enum.map(rows, fn(x) -> tl(x) end)   # remaining elements of each row
@@ -397,7 +398,8 @@ defmodule RayTracer.Matrix do
   """
   @spec almost_equal?(matrix, matrix, number, number) :: boolean
   def almost_equal?(x, y, eps \\ @comparison_epsilon, max_ulp \\ @comparison_max_ulp) do
-    Enum.zip(x, y)
+    x
+    |> Enum.zip(y)
     |> Enum.map(fn({r1, r2})->rows_almost_equal?(r1, r2, eps, max_ulp) end)
     |> Enum.all?
   end
@@ -455,9 +457,10 @@ defmodule RayTracer.Matrix do
   #
   # Compares two rows as being (approximately) equal.
   defp rows_almost_equal?(r1, r2, eps, max_ulp) do
-    x = Enum.zip(r1, r2)
-        |> Enum.map(fn({x, y})->close_enough?(x, y, eps, max_ulp) end)
-    Enum.all?(x)
+    r1
+      |> Enum.zip(r2)
+      |> Enum.map(fn({x, y})->close_enough?(x, y, eps, max_ulp) end)
+      |> Enum.all?
   end
 
   @doc """
