@@ -314,7 +314,7 @@ defmodule RayTracer.Matrix do
     """
   @spec sub(matrix, matrix) :: matrix
   def sub(x, y) do
-    Enum.zip(x, y) |> Enum.map(n({a, b}) -> subtract_rows(a, b) end)
+    Enum.zip(x, y) |> Enum.map(fn({a, b}) -> subtract_rows(a, b) end)
   end
 
   @spec from_r_tuple(RTuple.t) :: matrix
