@@ -3,7 +3,6 @@ defmodule RayTracer.Canvas do
   This module defines methods for drawing pixels
   """
 
-  alias RayTracer.RTuple
   alias RayTracer.Color
   alias RayTracer.Matrix
 
@@ -19,16 +18,16 @@ defmodule RayTracer.Canvas do
 
   defstruct width: 0, height: 0, pixels: %{}
 
-  @spec new(integer, integer, RTuple.t) :: t
+  @spec new(integer, integer, Color.t) :: t
   def new(width, height, color \\ Color.new(0, 0, 0)) do
     pixels = Matrix.new(height, width, color)
     %__MODULE__{width: width, height: height, pixels: pixels}
   end
 
-  @spec pixel_at(t, integer, integer) :: RTuple.t
+  @spec pixel_at(t, integer, integer) :: Color.t
   def pixel_at(canvas, x, y), do: Matrix.elem(canvas.pixels, y, x)
 
-  @spec write_pixel(t, integer, integer, RTuple.t) :: t
+  @spec write_pixel(t, integer, integer, Color.t) :: t
   def write_pixel(canvas = %__MODULE__{width: w, height: h, pixels: p}, x, y, color) do
     if x < 0 || x >= canvas.width || y < 0 || y >= canvas.height do
       raise ArgumentError, message: "Position out of bounds: #{x}, #{y}. Size is #{w},#{h}."
@@ -73,6 +72,7 @@ defmodule RayTracer.Canvas do
     end
   end
 
+  @spec color_to_ppm(Color.t) :: String.t
   defp color_to_ppm(color) do
    color
    |> Color.scale(@ppm_max_color_value)
