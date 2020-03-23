@@ -14,13 +14,13 @@ defmodule MatrixTest do
       """
       |> Matrix.from_string
 
-    assert m |> Matrix.elem(0,0) == 1
-    assert m |> Matrix.elem(0,3) == 4
-    assert m |> Matrix.elem(1,0) == 5.5
-    assert m |> Matrix.elem(1,2) == 7.5
-    assert m |> Matrix.elem(2,2) == 11
-    assert m |> Matrix.elem(3,2) == 15.5
-    assert m |> Matrix.elem(3,5) == nil
+    assert m |> Matrix.elem(0, 0) == 1
+    assert m |> Matrix.elem(0, 3) == 4
+    assert m |> Matrix.elem(1, 0) == 5.5
+    assert m |> Matrix.elem(1, 2) == 7.5
+    assert m |> Matrix.elem(2, 2) == 11
+    assert m |> Matrix.elem(3, 2) == 15.5
+    assert m |> Matrix.elem(3, 5) == nil
   end
 
   test "comparing matrices" do
