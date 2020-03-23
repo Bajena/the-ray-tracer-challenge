@@ -6,7 +6,7 @@ defmodule RayTracer.RTuple do
   import __MODULE__.Helpers
 
   @type t :: %__MODULE__{
-    values: tuple()
+    values: list()
   }
 
   defstruct values: {}
@@ -79,10 +79,10 @@ defmodule RayTracer.RTuple do
     v |> w == 0.0
   end
 
-  @spec new([number]) :: t
-  def new(values) when is_list(values), do: new(List.to_tuple(values))
-
   @spec new(tuple()) :: t
+  def new(values) when is_tuple(values), do: new(Tuple.to_list(values))
+
+  @spec new([number]) :: t
   def new(values) do
     %RayTracer.RTuple{values: values}
   end
@@ -119,6 +119,6 @@ defmodule RayTracer.RTuple do
 
   @spec value_at(t, integer) :: number
   defp value_at(%__MODULE__{values: v}, index) do
-    v |> Kernel.elem(index)
+    v |> Enum.at(index)
   end
 end

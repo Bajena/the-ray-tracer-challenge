@@ -320,7 +320,6 @@ defmodule RayTracer.Matrix do
   @spec from_r_tuple(RTuple.t) :: matrix
   def from_r_tuple(%RayTracer.RTuple{values: values}) do
     values
-    |> Tuple.to_list
     |> Enum.map(&(make_row(1, &1)))
   end
 

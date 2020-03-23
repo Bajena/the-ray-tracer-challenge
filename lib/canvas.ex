@@ -5,6 +5,7 @@ defmodule RayTracer.Canvas do
 
   alias RayTracer.RTuple
   alias RayTracer.Color
+  alias RayTracer.Matrix
 
   @type t :: %__MODULE__{
     width: integer,
@@ -12,33 +13,50 @@ defmodule RayTracer.Canvas do
     pixels: %{required(tuple()) => RTuple.t}
   }
 
+  @ppm_magic_number "P3"
+  @ppm_max_color_value 255
+
   defstruct width: 0, height: 0, pixels: %{}
 
-  @spec new(integer, integer) :: t
-  def new(width, height) do
-    %__MODULE__{width: width, height: height, pixels: build_pixels(width, height)}
+  @spec new(integer, integer, RTuple.t) :: t
+  def new(width, height, color \\ Color.new(0, 0, 0)) do
+    pixels = Matrix.new(height, width, color)
+    %__MODULE__{width: width, height: height, pixels: pixels}
   end
 
   @spec pixel_at(t, integer, integer) :: RTuple.t
-  def pixel_at(canvas, x, y), do: canvas.pixels[{x, y}]
+  def pixel_at(canvas, x, y), do: Matrix.elem(canvas.pixels, y, x)
 
   @spec write_pixel(t, integer, integer, RTuple.t) :: t
-  def write_pixel(canvas = %__MODULE__{pixels: p}, x, y, color) do
+  def write_pixel(canvas = %__MODULE__{width: w, height: h, pixels: p}, x, y, color) do
     if x < 0 || x >= canvas.width || y < 0 || y >= canvas.height do
-      raise ArgumentError, message: "Position out of bounds: #{x}, #{y}"
+      raise ArgumentError, message: "Position out of bounds: #{x}, #{y}. Size is #{w},#{h}."
     end
 
-    new_pixels = p |> Map.put({x, y}, color)
+    new_pixels = p |> Matrix.set(y, x, color)
+
     %__MODULE__{canvas | pixels: new_pixels}
   end
 
-  defp build_pixels(w, h), do: build_pixels(%{}, 0, 0, w, h)
-  defp build_pixels(pixels, _x, y, _w, h) when y >= h, do: pixels
-  defp build_pixels(pixels, x, y, w, h) do
-    new_x = if x == w - 1, do: 0, else: x + 1
-    new_y = if x == w - 1, do: y + 1, else: y
-    pixels |>
-    Map.put({x, y}, Color.new(0, 0, 0))
-    |> build_pixels(new_x, new_y, w, h)
+  def to_ppm(%RayTracer.Canvas{width: width, height: height, pixels: pixels}) do
+    pd =
+      pixels
+      |> Enum.map(&row_to_ppm/1)
+      |> Enum.join("\n")
+
+    "#{@ppm_magic_number}\n#{width} #{height}\n#{@ppm_max_color_value}\n#{pd}\n"
+  end
+
+  defp row_to_ppm(row) do
+    row
+    |> Enum.map(&color_to_ppm/1)
+    |> Enum.join(" ")
+  end
+
+  defp color_to_ppm(color) do
+   color
+   |> Color.scale(@ppm_max_color_value)
+   |> Color.map(fn (v) -> v |> round() |> to_string() end)
+   |> Enum.join(" ")
   end
 end
