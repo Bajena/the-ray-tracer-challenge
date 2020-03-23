@@ -10,7 +10,7 @@ defmodule RayTracer.Color do
   defdelegate map(c, f), to: RTuple.Helpers
 
   @spec new(number, number, number) :: RTuple.t
-  def new(r, g, b), do: RTuple.new({r, g, b})
+  def new(r, g, b), do: RTuple.new([r, g, b])
 
   @spec new(list(number) | tuple) :: RTuple.t
   defdelegate new(values), to: RTuple
@@ -27,7 +27,7 @@ defmodule RayTracer.Color do
   @doc """
   Returns a new color with values scaled to 0-base. Base is 255 by default.
   """
-  @spec scale(RTuple.t, integer) :: number
+  @spec scale(RTuple.t, number) :: RTuple.t
   def scale(c, base \\ 255) do
     c
     |> clamp
@@ -38,7 +38,7 @@ defmodule RayTracer.Color do
   @doc """
   Returns a new color with values limited to 0-1
   """
-  @spec clamp(RTuple.t) :: number
+  @spec clamp(RTuple.t) :: RTuple.t
   def clamp(c) do
     c |> RTuple.Helpers.map(&clamp_value/1) |> new
   end

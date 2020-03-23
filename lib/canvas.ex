@@ -10,11 +10,12 @@ defmodule RayTracer.Canvas do
   @type t :: %__MODULE__{
     width: integer,
     height: integer,
-    pixels: %{required(tuple()) => RTuple.t}
+    pixels: Matrix.matrix
   }
 
   @ppm_magic_number "P3"
   @ppm_max_color_value 255
+  @ppm_max_line_length 70
 
   defstruct width: 0, height: 0, pixels: %{}
 
@@ -38,6 +39,7 @@ defmodule RayTracer.Canvas do
     %__MODULE__{canvas | pixels: new_pixels}
   end
 
+  @spec to_ppm(t) :: String.t
   def to_ppm(%RayTracer.Canvas{width: width, height: height, pixels: pixels}) do
     pd =
       pixels
@@ -47,10 +49,28 @@ defmodule RayTracer.Canvas do
     "#{@ppm_magic_number}\n#{width} #{height}\n#{@ppm_max_color_value}\n#{pd}\n"
   end
 
+  @spec row_to_ppm(Matrix.row) :: String.t
   defp row_to_ppm(row) do
     row
     |> Enum.map(&color_to_ppm/1)
     |> Enum.join(" ")
+    |> break_ppm_line
+  end
+
+  @spec break_ppm_line(String.t) :: String.t
+  defp break_ppm_line(row_string, break_at \\ @ppm_max_line_length) do
+    case String.at(row_string, break_at) do
+      " " ->
+        row_string
+        |> String.split_at(break_at)
+        |> Tuple.to_list
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(fn(x) -> x |> String.length == 0 end)
+        |> Enum.map(&break_ppm_line/1)
+        |> Enum.join("\n")
+      nil -> row_string
+      _ -> break_ppm_line(row_string, break_at - 1)
+    end
   end
 
   defp color_to_ppm(color) do

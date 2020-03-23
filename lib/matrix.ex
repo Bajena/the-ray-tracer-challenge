@@ -24,7 +24,7 @@ defmodule RayTracer.Matrix do
   @typedoc """
       A list of values representing a matrix row.
   """
-  @type row :: [number]
+  @type row :: [any]
   @type matrix :: [row]
 
   @comparison_epsilon 1.0e-5
@@ -43,7 +43,7 @@ defmodule RayTracer.Matrix do
         iex> Matrix.new(2, 3, -10)
         [[-10, -10, -10], [-10, -10, -10]]
     """
-  @spec new(integer, integer, number) :: matrix
+  @spec new(integer, integer, any) :: matrix
   def new(rows, cols, val \\ 0) do
     for _r <- 1..rows, do: make_row(cols, val)
   end
@@ -167,7 +167,7 @@ defmodule RayTracer.Matrix do
         iex> Matrix.set( Matrix.ident(3), 0,0, -1)
         [[-1, 0, 0], [0, 1, 0], [0, 0, 1]]
     """
-  @spec set(matrix, integer, integer, number) :: matrix
+  @spec set(matrix, integer, integer, any) :: matrix
   def set(x, row, col, val) do
     row_vals = Enum.at(x, row)
     new_row = List.replace_at(row_vals, col, val)
@@ -185,7 +185,7 @@ defmodule RayTracer.Matrix do
         iex> Matrix.elem( Matrix.ident(3), 0,0 )
         1
     """
-  @spec elem(matrix, integer, integer) :: number
+  @spec elem(matrix, integer, integer) :: any
   def elem(x, row, col, default \\ nil) do
     row_vals = Enum.at(x, row, nil)
     if row_vals == nil, do: default, else: Enum.at(row_vals, col, default)
