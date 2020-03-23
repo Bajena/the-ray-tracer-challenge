@@ -38,6 +38,14 @@ defmodule RayTracer.Canvas do
     %__MODULE__{canvas | pixels: new_pixels}
   end
 
+  @spec export_to_ppm_file(t, String.t) :: :error | :ok
+  def export_to_ppm_file(canvas, filename \\ "canvas.ppm") do
+    case File.write(filename, canvas |> to_ppm) do
+      :ok -> :ok
+      _ -> :error
+    end
+  end
+
   @spec to_ppm(t) :: String.t
   def to_ppm(%RayTracer.Canvas{width: width, height: height, pixels: pixels}) do
     pd =
