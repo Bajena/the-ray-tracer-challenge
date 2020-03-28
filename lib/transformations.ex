@@ -12,4 +12,12 @@ defmodule RayTracer.Transformations do
     |> Matrix.set(1, 3, y)
     |> Matrix.set(2, 3, z)
   end
+
+  @spec scaling(number, number, number) :: Matrix.matrix
+  def scaling(x, y, z) do
+    Matrix.ident(4)
+    |> Matrix.set(0, 0, x)
+    |> Matrix.set(1, 1, y)
+    |> Matrix.set(2, 2, z)
+  end
 end
