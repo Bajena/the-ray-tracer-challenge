@@ -127,4 +127,23 @@ defmodule TransformationsTest do
 
     assert t |> mult(p) <~> point(2, 3, 7)
   end
+
+  test "Individual transformations are applied in sequence" do
+    p = point(1, 0, 1)
+    a = rotation_x(:math.pi / 2)
+    b = scaling(5, 5, 5)
+    c = translation(10, 5, 7)
+
+    # apply rotation first
+    p2 = a |> mult(p)
+    assert p2 <~> point(1, -1, 0)
+
+    # then apply scaling
+    p3 = b |> mult(p2)
+    assert p3 <~> point(5, -5, 0)
+
+    # then apply translation
+    p4 = c |> mult(p3)
+    assert p4 <~> point(15, 0, 7)
+  end
 end
