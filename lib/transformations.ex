@@ -56,4 +56,25 @@ defmodule RayTracer.Transformations do
     |> Matrix.set(1, 0, :math.sin(r))
     |> Matrix.set(1, 1, :math.cos(r))
   end
+
+
+  @doc """
+    Returns a shearing matrix in which:
+    - xy - moves x in proportion to y
+    - xz - moves x in proportion to z
+    - yx - moves y in proportion to x
+    - yz - moves y in proportion to z
+    - zx - moves z in proportion to x
+    - zy - moves z in proportion to y
+    """
+  @spec shearing(number, number, number, number, number, number) :: Matrix.matrix
+  def shearing(xy, xz, yx, yz, zx, zy) do
+    Matrix.ident(4)
+    |> Matrix.set(0, 1, xy)
+    |> Matrix.set(0, 2, xz)
+    |> Matrix.set(1, 0, yx)
+    |> Matrix.set(1, 2, yz)
+    |> Matrix.set(2, 0, zx)
+    |> Matrix.set(2, 1, zy)
+  end
 end

@@ -86,10 +86,45 @@ defmodule TransformationsTest do
     assert full_quarter |> mult(p) <~> point(-1, 0, 0)
   end
 
-# Scenario: Rotating a point around the z axis
-#   Given p ← point(0, 1, 0)
-#     And half_quarter ← rotation_z(π / 4)
-#     And full_quarter ← rotation_z(π / 2)
-#   Then half_quarter * p = point(-√2/2, √2/2, 0)
-#     And full_quarter * p = point(-1, 0, 0)
+  test "A shearing transformation moves x in proportion to y" do
+    t = shearing(1, 0, 0, 0, 0, 0)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(5, 3, 4)
+  end
+
+  test "A shearing transformation moves x in proportion to z" do
+    t = shearing(0, 1, 0, 0, 0, 0)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(6, 3, 4)
+  end
+
+  test "A shearing transformation moves y in proportion to x" do
+    t = shearing(0, 0, 1, 0, 0, 0)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(2, 5, 4)
+  end
+
+  test "A shearing transformation moves y in proportion to z" do
+    t = shearing(0, 0, 0, 1, 0, 0)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(2, 7, 4)
+  end
+
+  test "A shearing transformation moves z in proportion to x" do
+    t = shearing(0, 0, 0, 0, 1, 0)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(2, 3, 6)
+  end
+
+  test "A shearing transformation moves z in proportion to y" do
+    t = shearing(0, 0, 0, 0, 0, 1)
+    p = point(2, 3, 4)
+
+    assert t |> mult(p) <~> point(2, 3, 7)
+  end
 end
