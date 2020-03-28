@@ -146,4 +146,19 @@ defmodule TransformationsTest do
     p4 = c |> mult(p3)
     assert p4 <~> point(15, 0, 7)
   end
+
+  test "Chained transformations must be applied in reverse order" do
+    p = point(1, 0, 1)
+    a = rotation_x(:math.pi / 2)
+    b = scaling(5, 5, 5)
+    c = translation(10, 5, 7)
+
+    r =
+      c
+      |> mult(b)
+      |> mult(a)
+      |> mult(p)
+
+    assert r <~> point(15, 0, 7)
+  end
 end
