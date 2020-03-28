@@ -2,49 +2,94 @@ defmodule TransformationsTest do
   alias RayTracer.Matrix
   alias RayTracer.RTuple
   import RayTracer.Transformations
+  import RTuple.CustomOperators
+  import RTuple, only: [point: 3, vector: 3]
+  import Matrix, only: [mult: 2, inverse: 1]
 
   use ExUnit.Case
   doctest RayTracer.Transformations
 
   test "Multiplying by a translation matrix" do
     t = translation(5, -3, 2)
-    p = RTuple.point(-3, 4, 5)
+    p = point(-3, 4, 5)
 
-    assert t |> Matrix.mult(p) == RTuple.point(2, 1, 7)
+    assert t |> mult(p) == point(2, 1, 7)
   end
 
   test "Multiplying by the inverse of a translation matrix" do
-    inv = translation(5, -3, 2) |> Matrix.inverse
-    p = RTuple.point(-3, 4, 5)
+    inv = translation(5, -3, 2) |> inverse
+    p = point(-3, 4, 5)
 
-    assert inv |> Matrix.mult(p) == RTuple.point(-8, 7, 3)
+    assert inv |> mult(p) == point(-8, 7, 3)
   end
 
   test "Translation does not affect vectors" do
     t = translation(5, -3, 2)
-    v = RTuple.vector(-3, 4, 5)
+    v = vector(-3, 4, 5)
 
-    assert t |> Matrix.mult(v) == v
+    assert t |> mult(v) == v
   end
 
   test "A scaling matrix applied to a vector" do
     t = scaling(2, 3, 4)
-    p = RTuple.vector(-4, 6, 8)
+    p = vector(-4, 6, 8)
 
-    assert t |> Matrix.mult(p) == RTuple.vector(-8, 18, 32)
+    assert t |> mult(p) == vector(-8, 18, 32)
   end
 
   test "Multiplying by the inverse of a scaling matrix" do
-    inv = scaling(2, 3, 4) |> Matrix.inverse
-    v = RTuple.vector(-4, 6, 8)
+    inv = scaling(2, 3, 4) |> inverse
+    v = vector(-4, 6, 8)
 
-    assert inv |> Matrix.mult(v) == RTuple.vector(-2, 2, 2)
+    assert inv |> mult(v) == vector(-2, 2, 2)
   end
 
   test "Reflection is scaling by a negative value" do
     t = scaling(-1, 1, 1)
-    v = RTuple.vector(2, 3, 4)
+    v = vector(2, 3, 4)
 
-    assert t |> Matrix.mult(v) == RTuple.vector(-2, 3, 4)
+    assert t |> mult(v) == vector(-2, 3, 4)
   end
+
+  test "Rotating a point around the x axis" do
+    p = point(0, 1, 0)
+    half_quarter = rotation_x(:math.pi / 4)
+    full_quarter = rotation_x(:math.pi / 2)
+
+    assert half_quarter |> mult(p) <~> point(0, :math.sqrt(2) / 2, :math.sqrt(2) / 2)
+    assert full_quarter |> mult(p) <~> point(0, 0, 1)
+  end
+
+  test "The inverse of an x-rotation rotates in the opposite direction" do
+    p = point(0, 1, 0)
+    half_quarter = rotation_x(:math.pi / 4)
+    inv = inverse(half_quarter)
+
+    assert inv |> mult(p) <~> point(0, :math.sqrt(2) / 2, -:math.sqrt(2) / 2)
+  end
+
+  test "Rotating a point around the y axis" do
+    p = point(0, 0, 1)
+    half_quarter = rotation_y(:math.pi / 4)
+    full_quarter = rotation_y(:math.pi / 2)
+
+    assert half_quarter |> mult(p) <~> point(:math.sqrt(2) / 2, 0, :math.sqrt(2) / 2)
+    assert full_quarter |> mult(p) <~> point(1, 0, 0)
+  end
+
+  test "Rotating a point around the z axis" do
+    p = point(0, 1, 0)
+    half_quarter = rotation_z(:math.pi / 4)
+    full_quarter = rotation_z(:math.pi / 2)
+
+    assert half_quarter |> mult(p) <~> point(-:math.sqrt(2) / 2, :math.sqrt(2) / 2, 0)
+    assert full_quarter |> mult(p) <~> point(-1, 0, 0)
+  end
+
+# Scenario: Rotating a point around the z axis
+#   Given p ← point(0, 1, 0)
+#     And half_quarter ← rotation_z(π / 4)
+#     And full_quarter ← rotation_z(π / 2)
+#   Then half_quarter * p = point(-√2/2, √2/2, 0)
+#     And full_quarter * p = point(-1, 0, 0)
 end
