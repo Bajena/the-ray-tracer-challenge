@@ -8,6 +8,8 @@ defmodule RayTracer.RTuple do
   @type t :: %__MODULE__{
     values: list()
   }
+  @type vector :: t
+  @type point :: t
 
   defstruct values: {}
 
@@ -39,10 +41,10 @@ defmodule RayTracer.RTuple do
     a |> map(&(&1 / scalar)) |> new
   end
 
-  @spec length(t) :: number
+  @spec length(vector) :: number
   def length(a), do: magnitude(a)
 
-  @spec magnitude(t) :: number
+  @spec magnitude(vector) :: number
   def magnitude(a) do
     a |> map(&(&1 * &1)) |> Enum.sum() |> :math.sqrt
   end
@@ -87,12 +89,12 @@ defmodule RayTracer.RTuple do
     %RayTracer.RTuple{values: values}
   end
 
-  @spec point(number, number, number) :: t
+  @spec point(number, number, number) :: point
   def point(x, y, z) do
     {x, y, z, 1.0} |> new
   end
 
-  @spec vector(number, number, number) :: t
+  @spec vector(number, number, number) :: vector
   def vector(x, y, z) do
     {x, y, z, 0.0} |> new
   end
