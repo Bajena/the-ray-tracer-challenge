@@ -10,17 +10,18 @@ defmodule RayTracer.Intersection do
   import RTuple, only: [sub: 2, dot: 2]
 
   @type t :: %__MODULE__{
-    t: number
+    t: number,
+    object: Sphere.t
   }
 
-  defstruct [:t]
+  defstruct [:t, :object]
 
   @doc """
-  Builds an intersection of ray with shape at distance `t`
+  Builds an intersection of ray with shape `s` at distance `t`
   """
-  @spec new(number) :: t
-  def new(t) do
-    %__MODULE__{t: t}
+  @spec new(number, Sphere.t) :: t
+  def new(t, s) do
+    %__MODULE__{t: t, object: s}
   end
 
   @doc """
@@ -35,11 +36,21 @@ defmodule RayTracer.Intersection do
 
     discriminant = b * b - 4 * a * c
 
-    cond do
-      discriminant < 0 -> []
-        discriminant >= 0 ->
-        dsqrt = :math.sqrt(discriminant)
-        [(-b - dsqrt) / 2 * a, (-b + dsqrt) / 2 * a]
-    end |> Enum.map(&new(&1))
+    if discriminant < 0 do
+     []
+    else
+      dsqrt = :math.sqrt(discriminant)
+      [(-b - dsqrt) / 2 * a, (-b + dsqrt) / 2 * a]
+    end |> Enum.map(&new(&1, sphere))
+  end
+
+  @doc """
+  Returns a first non-negative intersection from intersections list
+  """
+  @spec hit(list(t)) :: t
+  def hit(intersections) do
+    intersections
+    |> Enum.reject(fn(i) -> i.t < 0 end)
+    |> Enum.min_by(&(&1.t), fn -> nil end)
   end
 end
