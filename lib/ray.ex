@@ -4,7 +4,7 @@ defmodule RayTracer.Ray do
   """
 
   alias RayTracer.RTuple
-  import RTuple, only: [mul: 2, add: 2]
+  alias RayTracer.Matrix
 
   @type t :: %__MODULE__{
     origin: RTuple.point,
@@ -13,9 +13,12 @@ defmodule RayTracer.Ray do
 
   defstruct [:origin, :direction]
 
+  @doc """
+  Builds a ray starting at `origin` and pointing in `direction`
+  """
   @spec new(RTuple.point, RTuple.vector) :: t
   def new(origin, direction) do
-    %RayTracer.Ray{origin: origin, direction: direction}
+    %__MODULE__{origin: origin, direction: direction}
   end
 
   @doc """
@@ -23,8 +26,16 @@ defmodule RayTracer.Ray do
   """
   @spec position(t, number) :: RTuple.point
   def position(ray, t) do
-    distance = mul(ray.direction, t)
+    distance = RTuple.mul(ray.direction, t)
 
-    ray.origin |> add(distance)
+    ray.origin |> RTuple.add(distance)
+  end
+
+  @doc """
+  Transforms ray by applying a transformation matrix t to origin and direction
+  """
+  @spec transform(t, Matrix.matrix) :: t
+  def transform(ray, t) do
+    %__MODULE__{origin: Matrix.mult(t, ray.origin), direction: Matrix.mult(t, ray.direction)}
   end
 end
