@@ -6,6 +6,7 @@ defmodule RayTracer.Intersection do
   alias RayTracer.Sphere
   alias RayTracer.Ray
   alias RayTracer.RTuple
+  alias RayTracer.Matrix
 
   import RTuple, only: [sub: 2, dot: 2]
 
@@ -29,9 +30,11 @@ defmodule RayTracer.Intersection do
   """
   @spec intersect(Sphere.t, Ray.t) :: list(t)
   def intersect(sphere = %Sphere{}, ray = %Ray{}) do
-    sphere_to_ray = sub(ray.origin, sphere.center)
-    a = dot(ray.direction, ray.direction)
-    b = 2 * dot(ray.direction, sphere_to_ray)
+    object_space_ray = ray |> Ray.transform(sphere.transform |> Matrix.inverse)
+
+    sphere_to_ray = sub(object_space_ray.origin, sphere.center)
+    a = dot(object_space_ray.direction, object_space_ray.direction)
+    b = 2 * dot(object_space_ray.direction, sphere_to_ray)
     c = dot(sphere_to_ray, sphere_to_ray) - sphere.r
 
     discriminant = b * b - 4 * a * c
@@ -40,14 +43,14 @@ defmodule RayTracer.Intersection do
      []
     else
       dsqrt = :math.sqrt(discriminant)
-      [(-b - dsqrt) / 2 * a, (-b + dsqrt) / 2 * a]
+      [(-b - dsqrt) / (2 * a), (-b + dsqrt) / (2 * a)]
     end |> Enum.map(&new(&1, sphere))
   end
 
   @doc """
   Returns a first non-negative intersection from intersections list
   """
-  @spec hit(list(t)) :: t
+  @spec hit(list(t)) :: t | nil
   def hit(intersections) do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)
