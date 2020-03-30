@@ -3,6 +3,7 @@ elixir:
   - '1.8'
 
 script:
+  - mix test
   - mix dialyzer
 
 cache:
