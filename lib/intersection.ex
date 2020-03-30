@@ -50,7 +50,7 @@ defmodule RayTracer.Intersection do
   @doc """
   Returns a first non-negative intersection from intersections list
   """
-  @spec hit(list(t)) :: t
+  @spec hit(list(t)) :: t | nil
   def hit(intersections) do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)

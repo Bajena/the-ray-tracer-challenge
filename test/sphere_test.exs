@@ -134,6 +134,6 @@ defmodule SphereTest do
     s = Sphere.new() |> Sphere.set_transform(translation(5, 0, 0))
     xs = intersect(s, r)
 
-    assert length(xs) == 0
+    assert Enum.empty?(xs)
   end
 end
