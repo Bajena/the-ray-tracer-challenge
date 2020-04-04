@@ -22,8 +22,25 @@ defmodule RayTracer.Sphere do
     %__MODULE__{center: center, r: radius, transform: transform}
   end
 
-  @spec new(t, Matrix.matrix) :: t
+  @spec set_transform(t, Matrix.matrix) :: t
   def set_transform(s, t) do
     %__MODULE__{s | transform: t}
+  end
+
+  @spec normal_at(t, RTuple.point) :: RTuple.vector
+  def normal_at(sphere, p) do
+    tinv = Matrix.inverse(sphere.transform)
+    object_point = tinv |> Matrix.mult(p)
+
+    object_normal =
+      object_point
+      |> RTuple.sub(sphere.center)
+      |> RTuple.normalize
+
+    tinv
+    |> Matrix.transpose
+    |> Matrix.mult(object_normal)
+    |> RTuple.set_w(0)
+    |> RTuple.normalize
   end
 end
