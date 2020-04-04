@@ -1,5 +1,9 @@
 defmodule RTupleTest do
   alias RayTracer.RTuple
+
+  import RTuple, only: [point: 3, vector: 3, reflect: 2]
+  import RTuple.CustomOperators
+
   use ExUnit.Case
   doctest RayTracer.RTuple
 
@@ -115,4 +119,30 @@ defmodule RTupleTest do
     assert RTuple.cross(v1, v2) == RTuple.vector(-1, 2, -1)
     assert RTuple.cross(v2, v1) == RTuple.vector(1, -2, 1)
   end
+
+  test "Reflecting a vector approaching at 45°" do
+    v = vector(1, -1, 0)
+    n = vector(0, 1, 0)
+
+    assert reflect(v, n) == vector(1, 1, 0)
+  end
+
+  test "Reflecting a vector off a slanted surface" do
+    v = vector(0, -1, 0)
+    n = vector(:math.sqrt(2) / 2, :math.sqrt(2) / 2, 0)
+
+    assert reflect(v, n) <~> vector(1, 0, 0)
+  end
+
+# Scenario: Reflecting a vector approaching at 45°
+#   Given v ← vector(1, -1, 0)
+#     And n ← vector(0, 1, 0)
+#   When r ← reflect(v, n)
+#   Then r = vector(1, 1, 0)
+
+# Scenario: Reflecting a vector off a slanted surface
+#   Given v ← vector(0, -1, 0)
+#     And n ← vector(√2/2, √2/2, 0)
+#   When r ← reflect(v, n)
+#   Then r = vector(1, 0, 0)
 end

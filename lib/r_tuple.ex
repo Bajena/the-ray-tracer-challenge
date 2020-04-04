@@ -129,6 +129,17 @@ defmodule RayTracer.RTuple do
   @spec set_w(t, number) :: t
   def set_w(t, v), do: set(t, 3, v)
 
+  @doc """
+  Computes a reflection of vector around the normal
+  """
+  @spec reflect(vector, vector) :: vector
+  def reflect(v, n) do
+    v
+    |> sub(
+      n |> mul(2) |> mul(dot(n, v))
+    )
+  end
+
   @spec value_at(t, integer) :: number
   defp value_at(%__MODULE__{values: v}, index) do
     v |> Enum.at(index)
