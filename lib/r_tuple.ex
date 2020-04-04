@@ -119,6 +119,16 @@ defmodule RayTracer.RTuple do
     v |> value_at(3)
   end
 
+  @spec set(t, integer, number) :: t
+  def set(%__MODULE__{values: values}, index, value) do
+    values
+    |> List.update_at(index, fn (_) -> value end)
+    |> new
+  end
+
+  @spec set_w(t, number) :: t
+  def set_w(t, v), do: set(t, 3, v)
+
   @spec value_at(t, integer) :: number
   defp value_at(%__MODULE__{values: v}, index) do
     v |> Enum.at(index)

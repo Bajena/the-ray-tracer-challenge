@@ -7,6 +7,7 @@ defmodule SphereTest do
   import RTuple, only: [point: 3, vector: 3]
   import Intersection, only: [intersect: 2, hit: 1]
   import RayTracer.Transformations
+  import RayTracer.RTuple.CustomOperators
 
   use ExUnit.Case
   doctest RayTracer.Sphere
@@ -135,5 +136,44 @@ defmodule SphereTest do
     xs = intersect(s, r)
 
     assert Enum.empty?(xs)
+  end
+
+  test "The normal on a sphere at a point on the x axis" do
+    assert Sphere.new() |> Sphere.normal_at(point(1, 0, 0)) == vector(1, 0, 0)
+  end
+
+  test "The normal on a sphere at a point on the y axis" do
+    assert Sphere.new() |> Sphere.normal_at(point(0, 1, 0)) == vector(0, 1, 0)
+  end
+
+  test "The normal on a sphere at a point on the z axis" do
+    assert Sphere.new() |> Sphere.normal_at(point(0, 0, 1)) == vector(0, 0, 1)
+  end
+
+  test "The normal on a sphere at a nonaxial point" do
+    v = :math.sqrt(3) / 3
+    assert Sphere.new() |> Sphere.normal_at(point(v, v, v)) == vector(v, v, v)
+  end
+
+  test "The normal is a normalized vector" do
+    v = :math.sqrt(3) / 3
+    n = Sphere.new() |> Sphere.normal_at(point(v, v, v))
+
+    assert n == n |> RTuple.normalize
+  end
+
+  test "Computing the normal on a translated sphere" do
+    s = Sphere.new() |> Sphere.set_transform(translation(0, 1, 0))
+    n = s |> Sphere.normal_at(point(0, 1.70711, -0.70711))
+
+    assert n <~> vector(0, 0.70711, -0.70711)
+  end
+
+  test "Computing the normal on a transformed sphere" do
+    t = scaling(1, 0.5, 1) |> Matrix.mult(rotation_z(:math.pi / 5))
+    s = Sphere.new() |> Sphere.set_transform(t)
+    n = s |> Sphere.normal_at(point(0, :math.sqrt(2) / 2, -:math.sqrt(2) / 2))
+
+    assert n <~> vector(0, 0.97014, -0.24254)
   end
 end
