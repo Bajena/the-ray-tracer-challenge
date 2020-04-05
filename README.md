@@ -1,5 +1,7 @@
 # RayTracer
 
+[![Build Status](https://travis-ci.com/Bajena/the-ray-tracer-challenge.svg?branch=master)](https://travis-ci.com/Bajena/the-ray-tracer-challenge)
+
 This repo is an implementation of [The Ray Tracer Challenge by Jamis Buck](https://pragprog.com/book/jbtracer/the-ray-tracer-challenge) in Elixir language.
 
 ![image](https://user-images.githubusercontent.com/5732023/77826309-ea251100-710e-11ea-9e7f-f6fdee105f0b.png)
