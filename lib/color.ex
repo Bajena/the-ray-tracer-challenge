@@ -53,6 +53,9 @@ defmodule RayTracer.Color do
     c1 |> RTuple.Helpers.zip_map(c2, &(&1 * &2)) |> new
   end
 
+  def white, do: new(1, 1, 1)
+  def black, do: new(0, 0, 0)
+
   defp clamp_value(v) when v < 0, do: 0
   defp clamp_value(v) when v > 1, do: 1
   defp clamp_value(v), do: v

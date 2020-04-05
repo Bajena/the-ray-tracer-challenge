@@ -5,6 +5,7 @@ defmodule RayTracer.Sphere do
 
   alias RayTracer.RTuple
   alias RayTracer.Matrix
+  alias RayTracer.Material
 
   @type t :: %__MODULE__{
     center: RTuple.point,
@@ -12,14 +13,14 @@ defmodule RayTracer.Sphere do
     transform: Matrix.matrix
   }
 
-  defstruct [:center, :r, :transform]
+  defstruct [:center, :r, :transform, :material]
 
   @doc """
   Builds a sphere with given `center`, radius `r` and transformation matrix
   """
   @spec new(RTuple.point, number) :: t
-  def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident(4)) do
-    %__MODULE__{center: center, r: radius, transform: transform}
+  def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident(4), material \\ Material.new) do
+    %__MODULE__{center: center, r: radius, transform: transform, material: material}
   end
 
   @spec set_transform(t, Matrix.matrix) :: t
