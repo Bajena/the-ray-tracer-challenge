@@ -23,3 +23,5 @@ erl_crash.dump
 ray_tracer-*.tar
 
 .DS_Store
+
+*.ppm
