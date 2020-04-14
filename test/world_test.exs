@@ -9,6 +9,7 @@ defmodule WorldTest do
   alias RayTracer.Light
   alias RayTracer.Intersection
 
+  import RayTracer.RTuple.CustomOperators
   import RTuple, only: [point: 3, vector: 3]
 
   use ExUnit.Case
@@ -44,5 +45,51 @@ defmodule WorldTest do
     assert Enum.at(xs, 1).t == 4.5
     assert Enum.at(xs, 2).t == 5.5
     assert Enum.at(xs, 3).t == 6
+  end
+
+  test "Shading an intersection" do
+    w = World.default()
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+    s = Enum.at(w.objects, 0)
+    i = Intersection.new(4, s)
+    comps = Intersection.prepare_computations(i, r)
+
+    c = w |> World.shade_hit(comps)
+
+    assert c <~> Color.new(0.38066, 0.47583, 0.2855)
+  end
+
+  test "The color when a ray misses" do
+    w = World.default()
+    r = Ray.new(point(0, 0, -5), vector(0, 1, 0))
+    c = w |> World.color_at(r)
+
+    assert c <~> Color.new(0, 0, 0)
+  end
+
+  test "The color when a ray hits" do
+    w = World.default()
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+    c = w |> World.color_at(r)
+
+    assert c <~> Color.new(0.38066, 0.47583, 0.2855)
+  end
+
+  test "The color with an intersection behind the ray" do
+    dw = World.default()
+    douter = Enum.at(dw.objects, 0)
+    dinner = Enum.at(dw.objects, 1)
+
+    w = %World{
+      dw | objects: [
+        %Sphere{douter | material: %Material{douter.material | ambient: 1}},
+        %Sphere{dinner | material: %Material{dinner.material | ambient: 1}}
+      ]
+    }
+    inner = Enum.at(w.objects, 1)
+
+    r = Ray.new(point(0, 0, 0.75), vector(0, 0, -1))
+    c = w |> World.color_at(r)
+    assert c <~> inner.material.color
   end
 end
