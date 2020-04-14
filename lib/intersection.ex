@@ -16,6 +16,15 @@ defmodule RayTracer.Intersection do
     object: Sphere.t
   }
 
+  @type computation :: %{
+    t: number,
+    object: Sphere.t,
+    point: RTuple.point,
+    eyev: RTuple.vector,
+    normalv: RTuple.vector,
+    inside: boolean
+  }
+
   defstruct [:t, :object]
 
   @doc """
@@ -66,5 +75,31 @@ defmodule RayTracer.Intersection do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)
     |> Enum.min_by(&(&1.t), fn -> nil end)
+  end
+
+  @doc """
+  Prepares data for shading computations
+  """
+  @spec prepare_computations(t, Ray.t) :: computation
+  def prepare_computations(intersection, ray) do
+    p = ray |> Ray.position(intersection.t)
+    eyev = RTuple.negate(ray.direction)
+    normalv = intersection.object |> Sphere.normal_at(p)
+    inside = inside?(normalv, eyev)
+
+    %{
+      t: intersection.t,
+      object: intersection.object,
+      point: p,
+      eyev: eyev,
+      normalv: (if inside, do: RTuple.negate(normalv), else: normalv),
+      inside: inside
+    }
+  end
+
+  # Tests if the intersection occured inside the object
+  @spec inside?(RTuple.vector, RTuple.vector) :: boolean
+  defp inside?(normalv, eyev) do
+    RTuple.dot(normalv, eyev) < 0
   end
 end
