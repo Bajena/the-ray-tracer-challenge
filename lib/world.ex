@@ -9,6 +9,8 @@ defmodule RayTracer.World do
   alias RayTracer.Transformations
   alias RayTracer.RTuple
   alias RayTracer.Color
+  alias RayTracer.Intersection
+  alias RayTracer.Ray
 
   @type t :: %__MODULE__{
     objects: list(Sphere.t),
@@ -38,5 +40,32 @@ defmodule RayTracer.World do
     light = Light.point_light(RTuple.point(-10, 10, -10), Color.white)
 
     new([s1, s2], light)
+  end
+
+  @doc """
+  Computes shading for a ray hitting a world
+  """
+  @spec color_at(t, Ray.t) :: Color.t
+  def color_at(world, ray) do
+    hit =
+      world
+      |> Intersection.intersect_world(ray)
+      |> Intersection.hit
+
+    if hit do
+      world |> shade_hit(hit |> Intersection.prepare_computations(ray))
+    else
+      Color.black
+    end
+  end
+
+  @doc """
+  Shades an intersection
+  """
+  @spec shade_hit(t, Intersection.computation) :: Color.t
+  def shade_hit(world, comps) do
+    Light.lighting(
+      comps.object.material, world.light, comps.point, comps.eyev, comps.normalv
+    )
   end
 end

@@ -10,7 +10,8 @@ defmodule RayTracer.Sphere do
   @type t :: %__MODULE__{
     center: RTuple.point,
     r: number,
-    transform: Matrix.matrix
+    transform: Matrix.matrix,
+    material: Material.t
   }
 
   defstruct [:center, :r, :transform, :material]
