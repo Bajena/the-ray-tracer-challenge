@@ -7,6 +7,7 @@ defmodule RayTracer.Intersection do
   alias RayTracer.Ray
   alias RayTracer.RTuple
   alias RayTracer.Matrix
+  alias RayTracer.World
 
   import RTuple, only: [sub: 2, dot: 2]
 
@@ -45,6 +46,16 @@ defmodule RayTracer.Intersection do
       dsqrt = :math.sqrt(discriminant)
       [(-b - dsqrt) / (2 * a), (-b + dsqrt) / (2 * a)]
     end |> Enum.map(&new(&1, sphere))
+  end
+
+  @doc """
+  Builds an intersection of ray with world `w`
+  """
+  @spec intersect_world(World.t, Ray.t) :: list(t)
+  def intersect_world(world, ray) do
+    world.objects
+    |> Enum.flat_map(&intersect(&1, ray))
+    |> Enum.sort_by(&(&1.t))
   end
 
   @doc """
