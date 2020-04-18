@@ -20,7 +20,7 @@ defmodule RayTracer.Sphere do
   Builds a sphere with given `center`, radius `r` and transformation matrix
   """
   @spec new(RTuple.point, number) :: t
-  def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident(4), material \\ Material.new) do
+  def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident, material \\ Material.new) do
     %__MODULE__{center: center, r: radius, transform: transform, material: material}
   end
 

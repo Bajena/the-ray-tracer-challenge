@@ -134,7 +134,7 @@ defmodule RayTracer.Matrix do
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     """
   @spec ident(integer) :: matrix
-  def ident(rows), do: diag(make_row(rows, 1))
+  def ident(rows \\ 4), do: diag(make_row(rows, 1))
 
 
 
