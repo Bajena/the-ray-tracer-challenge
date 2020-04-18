@@ -111,7 +111,7 @@ defmodule SphereTest do
   test "A sphere's default transformation" do
     s = Sphere.new()
 
-    assert s.transform == Matrix.ident(4)
+    assert s.transform == Matrix.ident
   end
 
   test "Changing a sphere's transformation" do

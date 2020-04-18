@@ -111,13 +111,13 @@ defmodule MatrixTest do
       """
       |> Matrix.from_string
 
-    m2 = Matrix.ident(4)
+    m2 = Matrix.ident
 
     assert Matrix.mult(m1, m2) == m1
   end
 
   test "Multiplying the identity matrix by a tuple" do
-    m = Matrix.ident(4)
+    m = Matrix.ident
     t = RTuple.new([1, 2, 3, 4])
 
     assert Matrix.mult(m, t) == t
@@ -146,7 +146,7 @@ defmodule MatrixTest do
   end
 
   test "Transposing an identity matrix" do
-    m = Matrix.ident(4)
+    m = Matrix.ident
 
     assert Matrix.transpose(m) == m
   end
