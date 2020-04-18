@@ -13,7 +13,7 @@ This repo is an implementation of [The Ray Tracer Challenge by Jamis Buck](https
 - ✅ Chapter 4: Matrix transformations
 - ✅ Chapter 5: [Ray-Sphere intersections](https://user-images.githubusercontent.com/5732023/78502886-b035b980-7763-11ea-8afc-c04eb0d738f3.png)
 - ✅ Chapter 6: [Light and Shading](https://user-images.githubusercontent.com/5732023/78503621-1a505d80-7768-11ea-9f26-3c52ae5eb153.png)
-- Chapter 7: Making a Scene
+- ✅ Chapter 7: [Making a Scene](https://user-images.githubusercontent.com/5732023/79645024-eb48db80-81ac-11ea-95d9-4a32cbed9ec4.png)
 - Chapter 8: Shadows
 - Chapter 9: Planes
 - Chapter 10: Patterns
