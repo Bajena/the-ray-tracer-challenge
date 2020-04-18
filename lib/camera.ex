@@ -54,6 +54,8 @@ defmodule RayTracer.Camera do
   @spec render(t, World.t) :: Canvas.t
   def render(camera, world) do
     Enum.reduce(0..(camera.vsize - 1), Canvas.new(camera.hsize, camera.vsize), fn y, canvas ->
+      if rem(y, 10) == 0, do: IO.puts("#{y}/#{camera.vsize}")
+
       Enum.reduce(0..(camera.hsize - 1), canvas, fn x, canvas ->
         ray = ray_for_pixel(camera, x, y)
         color = World.color_at(world, ray)
