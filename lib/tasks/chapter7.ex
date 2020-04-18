@@ -4,9 +4,7 @@ defmodule RayTracer.Tasks.Chapter7 do
   """
 
   alias RayTracer.RTuple
-  alias RayTracer.Ray
   alias RayTracer.Sphere
-  alias RayTracer.Intersection
   alias RayTracer.Canvas
   alias RayTracer.Material
   alias RayTracer.Color
@@ -15,8 +13,7 @@ defmodule RayTracer.Tasks.Chapter7 do
   alias RayTracer.Camera
   alias RayTracer.Matrix
 
-  import Intersection, only: [intersect: 2]
-  import RTuple, only: [point: 3, vector: 3, normalize: 1]
+  import RTuple, only: [point: 3, vector: 3]
   import Light, only: [point_light: 2]
   import RayTracer.Transformations
 
@@ -27,7 +24,7 @@ defmodule RayTracer.Tasks.Chapter7 do
   def execute(w \\ 100, h \\ 50) do
     # RayTracer.Tasks.Chapter7.execute
 
-    world = build_world
+    world = build_world()
     camera = build_camera(w, h)
 
     camera
@@ -39,7 +36,7 @@ defmodule RayTracer.Tasks.Chapter7 do
 
   defp build_world do
     objects = [
-      left_wall, right_wall, floor, left_sphere, middle_sphere, right_sphere
+      left_wall(), right_wall(), floor(), left_sphere(), middle_sphere(), right_sphere()
     ]
     light = point_light(point(-10, 10, -10), Color.new(1, 1, 1))
 
@@ -59,7 +56,7 @@ defmodule RayTracer.Tasks.Chapter7 do
       |> Matrix.mult(rotation_x(:math.pi / 2))
       |> Matrix.mult(scaling(10, 0.01, 10))
 
-    %Sphere{floor | transform: transform}
+    %Sphere{floor() | transform: transform}
   end
 
   defp right_wall do
@@ -69,7 +66,7 @@ defmodule RayTracer.Tasks.Chapter7 do
       |> Matrix.mult(rotation_x(:math.pi / 2))
       |> Matrix.mult(scaling(10, 0.01, 10))
 
-    %Sphere{floor | transform: transform}
+    %Sphere{floor() | transform: transform}
   end
 
   defp floor do
