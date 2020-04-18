@@ -7,6 +7,12 @@ defmodule RayTracer.Camera do
   """
 
   alias RayTracer.Matrix
+  alias RayTracer.Ray
+  alias RayTracer.RTuple
+  alias RayTracer.World
+  alias RayTracer.Canvas
+
+  import RTuple, only: [point: 3]
 
   @type t :: %__MODULE__{
     hsize: integer,
@@ -34,12 +40,56 @@ defmodule RayTracer.Camera do
   """
   @spec new(integer, integer, number, Matrix.matrix) :: t
   def new(hsize, vsize, field_of_view, transform \\ Matrix.ident) do
-    values = %__MODULE__{
+    %__MODULE__{
       hsize: hsize,
       vsize: vsize,
       field_of_view: field_of_view,
       transform: transform
     } |> Map.merge(compute_sizes(hsize, vsize, field_of_view))
+  end
+
+  @doc """
+  Renders the provided world on a canvas defined by camera's properties
+  """
+  @spec render(t, World.t) :: Canvas.t
+  def render(camera, world) do
+    Enum.reduce(0..(camera.vsize - 1), Canvas.new(camera.hsize, camera.vsize), fn y, canvas ->
+      Enum.reduce(0..(camera.hsize - 1), canvas, fn x, canvas ->
+        ray = ray_for_pixel(camera, x, y)
+        color = World.color_at(world, ray)
+
+        canvas |> Canvas.write_pixel(x, y, color)
+      end)
+    end)
+  end
+
+  @doc """
+  Computes the world coordinates at the center of the given pixel and then constructs
+  a ray that passes through that point.
+  `px` - x position of the pixel
+  `py` - y position of the pixel
+  """
+  @spec ray_for_pixel(t, number, number) :: Ray.t
+  def ray_for_pixel(camera, px, py) do
+    # The offset from the edge of the canvas to the pixel's center
+    x_offset = (px + 0.5) * camera.pixel_size
+    y_offset = (py + 0.5) * camera.pixel_size
+
+    # The untransformed coordinates of the pixel in world space.
+    # Remember that the camera looks toward -z, so +x is to the left.
+    world_x = camera.half_width - x_offset
+    world_y = camera.half_height - y_offset
+
+    # Using the camera matrix transform the canvas point and the origin.
+    # Then compute the ray's direction vector.
+    # Remember that the canvas is at z = -1
+    invct = Matrix.inverse(camera.transform)
+    world_point = point(world_x, world_y, -1)
+    pixel = invct |> Matrix.mult(world_point)
+    origin = invct |> Matrix.mult(point(0, 0, 0))
+    direction = RTuple.sub(pixel, origin) |> RTuple.normalize
+
+    Ray.new(origin, direction)
   end
 
   # Computes:
