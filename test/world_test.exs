@@ -92,4 +92,46 @@ defmodule WorldTest do
     c = w |> World.color_at(r)
     assert c <~> inner.material.color
   end
+
+  test "There is no shadow when nothing is collinear with point and light" do
+    w = World.default()
+    p = point(0, 10, 0)
+
+    assert w |> World.is_shadowed(p) == false
+  end
+
+  test "The shadow when an object is between the point and the light" do
+    w = World.default()
+    p = point(10, -10, 10)
+
+    assert w |> World.is_shadowed(p) == true
+  end
+
+  test "There is no shadow when an object is behind the light" do
+    w = World.default()
+    p = point(-20, 20, -20)
+
+    assert w |> World.is_shadowed(p) == false
+  end
+
+  test "There is no shadow when an object is behind the point" do
+    w = World.default()
+    p = point(-2, 2, -2)
+
+    assert w |> World.is_shadowed(p) == false
+  end
+
+  test "shade_hit() is given an intersection in shadow" do
+    light = Light.point_light(point(0, 0, -10), Color.new(1, 1, 1))
+    s1 = Sphere.new
+    s2 = Sphere.new |> Sphere.set_transform(Transformations.translation(0, 0, 10))
+    w = World.new([s1, s2], light)
+
+    r = Ray.new(point(0, 0, 5), vector(0, 0, 1))
+    i = Intersection.new(4, s2)
+    comps = i |> Intersection.prepare_computations(r)
+    c = w |> World.shade_hit(comps)
+
+    assert c <~> Color.new(0.1, 0.1, 0.1)
+  end
 end

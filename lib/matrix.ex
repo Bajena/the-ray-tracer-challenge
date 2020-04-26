@@ -1,5 +1,6 @@
 defmodule RayTracer.Matrix do
   alias RayTracer.RTuple
+  import RayTracer.Constants
 
   @moduledoc """
   *Matrix* is a linear algebra library for manipulating dense matrices. Its
@@ -27,7 +28,7 @@ defmodule RayTracer.Matrix do
   @type row :: [any]
   @type matrix :: [row]
 
-  @comparison_epsilon 1.0e-5
+  @comparison_epsilon epsilon()
   @comparison_max_ulp 1
 
 
