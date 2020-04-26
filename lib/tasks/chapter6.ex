@@ -53,7 +53,7 @@ defmodule RayTracer.Tasks.Chapter6 do
           hit_at = ray |> Ray.position(hit.t)
           normal = hit.object |> Sphere.normal_at(hit_at)
           eye = RTuple.negate(ray.direction)
-          color = Light.lighting(hit.object.material, light, hit_at, eye, normal)
+          color = Light.lighting(hit.object.material, light, hit_at, eye, normal, false)
           canvas |> Canvas.write_pixel(x, y, color)
         else
           canvas

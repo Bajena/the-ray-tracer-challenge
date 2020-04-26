@@ -47,10 +47,7 @@ defmodule RayTracer.World do
   """
   @spec color_at(t, Ray.t) :: Color.t
   def color_at(world, ray) do
-    hit =
-      world
-      |> Intersection.intersect_world(ray)
-      |> Intersection.hit
+    hit = world |> ray_hit(ray)
 
     if hit do
       world |> shade_hit(hit |> Intersection.prepare_computations(ray))
@@ -65,7 +62,33 @@ defmodule RayTracer.World do
   @spec shade_hit(t, Intersection.computation) :: Color.t
   def shade_hit(world, comps) do
     Light.lighting(
-      comps.object.material, world.light, comps.point, comps.eyev, comps.normalv
+      comps.object.material,
+      world.light,
+      comps.over_point,
+      comps.eyev,
+      comps.normalv,
+      world |> is_shadowed(comps.over_point)
     )
+  end
+
+  @doc """
+  Informs whether a given point is in shadow
+  """
+  @spec is_shadowed(t, RTuple.point) :: boolean
+  def is_shadowed(world, point) do
+    point_to_light_vector = RTuple.sub(world.light.position, point)
+    distance = point_to_light_vector |> RTuple.length
+    shadow_ray = Ray.new(point, point_to_light_vector  |> RTuple.normalize)
+
+    shadow_hit = world |> ray_hit(shadow_ray)
+
+    shadow_hit != nil && shadow_hit.t < distance
+  end
+
+  # Returns a closest ray hit
+  defp ray_hit(world, ray) do
+    world
+    |> Intersection.intersect_world(ray)
+    |> Intersection.hit
   end
 end

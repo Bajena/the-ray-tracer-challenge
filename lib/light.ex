@@ -32,9 +32,10 @@ defmodule RayTracer.Light do
   `light` - light source
   `eyev` - eye vector
   `normalv` - surface normal vector
+  `in_shadow` - indicates whether the point is in shadow of an object
   """
-  @spec lighting(Material.t, t, RTuple.point, RTuple.vector, RTuple.vector) :: Color.t
-  def lighting(material, light, position, eyev, normalv) do
+  @spec lighting(Material.t, t, RTuple.point, RTuple.vector, RTuple.vector, boolean) :: Color.t
+  def lighting(material, light, position, eyev, normalv, in_shadow) do
     # Combine the surface color with the light's color/intensity
     effective_color = material.color |> Color.hadamard_product(light.intensity)
 
@@ -44,15 +45,19 @@ defmodule RayTracer.Light do
     # Compute the ambient contribution
     ambient = effective_color |> Color.mul(material.ambient)
 
-    # `light_dot_normal` represents the cosine of the angle between the
-    # light vector and the normal vector. A negative number means the
-    # light is on the other side of the surface.
-    light_dot_normal = RTuple.dot(lightv, normalv)
+    if in_shadow do
+      ambient
+    else
+      # `light_dot_normal` represents the cosine of the angle between the
+      # light vector and the normal vector. A negative number means the
+      # light is on the other side of the surface.
+      light_dot_normal = RTuple.dot(lightv, normalv)
 
-    diffuse = calc_diffuse(light_dot_normal, effective_color, material)
-    specular = calc_specular(light_dot_normal, lightv, normalv, eyev, material, light)
+      diffuse = calc_diffuse(light_dot_normal, effective_color, material)
+      specular = calc_specular(light_dot_normal, lightv, normalv, eyev, material, light)
 
-    ambient |> Color.add(diffuse) |> Color.add(specular)
+      ambient |> Color.add(diffuse) |> Color.add(specular)
+    end
   end
 
   defp calc_diffuse(light_dot_normal, _, _) when light_dot_normal < 0, do: Color.black
