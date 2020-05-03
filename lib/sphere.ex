@@ -21,14 +21,16 @@ defmodule RayTracer.Sphere do
   }
 
   defimpl Shape.Shadeable do
-    # @spec normal_at(t, RTuple.point) :: RTuple.vector
+    alias RayTracer.{Sphere, RTuple, Intersection, Ray}
+
+    @spec local_normal_at(Sphere.t, RTuple.point) :: RTuple.vector
     def local_normal_at(sphere, object_point) do
       object_point
       |> RTuple.sub(sphere.center)
       |> RTuple.normalize
     end
 
-    # @spec local_intersect(t, Ray.t) :: list(Intersection.t)
+    @spec local_intersect(Sphere.t, Ray.t) :: list(Intersection.t)
     def local_intersect(sphere, object_space_ray) do
       sphere_to_ray = sub(object_space_ray.origin, sphere.center)
       a = dot(object_space_ray.direction, object_space_ray.direction)

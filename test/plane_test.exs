@@ -1,14 +1,9 @@
 defmodule PlaneTest do
   alias RayTracer.RTuple
-  alias RayTracer.Matrix
   alias RayTracer.Ray
   alias RayTracer.Plane
   alias RayTracer.Shape
-  alias RayTracer.Intersection
   import RTuple, only: [point: 3, vector: 3]
-  import Intersection, only: [intersect: 2, hit: 1]
-  import RayTracer.Transformations
-  import RayTracer.RTuple.CustomOperators
 
   use ExUnit.Case
   doctest RayTracer.Plane

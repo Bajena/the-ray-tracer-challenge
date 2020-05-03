@@ -6,15 +6,15 @@ defmodule RayTracer.Plane do
   alias RayTracer.Shape
   use Shape
 
-  @type t :: %__MODULE__{
-    transform: Matrix.matrix,
-    material: Material.t
-  }
-
   alias RayTracer.RTuple
   alias RayTracer.Matrix
   alias RayTracer.Material
   alias RayTracer.Intersection
+
+  @type t :: %__MODULE__{
+    transform: Matrix.matrix,
+    material: Material.t
+  }
 
   import RayTracer.Constants
 
@@ -27,12 +27,14 @@ defmodule RayTracer.Plane do
   end
 
   defimpl Shape.Shadeable do
-    # @spec normal_at(t, RTuple.point) :: RTuple.vector
+    alias RayTracer.{Plane, RTuple, Intersection, Ray}
+
+    @spec local_normal_at(Plane.t, RTuple.point) :: RTuple.vector
     def local_normal_at(_plane, _) do
       RTuple.vector(0, 1, 0)
     end
 
-    # @spec local_intersect(t, Ray.t) :: list(Intersection.t)
+    @spec local_intersect(Plane.t, Ray.t) :: list(Intersection.t)
     def local_intersect(shape, object_space_ray) do
       if abs(object_space_ray.direction |> RTuple.y) < epsilon do
         []

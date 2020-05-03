@@ -4,6 +4,8 @@ defmodule RayTracer.Shape do
   """
   alias RayTracer.Matrix
   alias RayTracer.RTuple
+  alias RayTracer.Intersection
+  alias RayTracer.Ray
 
   defprotocol Shadeable do
     def local_normal_at(shape, object_point)
@@ -24,6 +26,7 @@ defmodule RayTracer.Shape do
 
   @type t :: RayTracer.Sphere.t | RayTracer.Plane.t
 
+  @spec normal_at(t, RTuple.point) :: RTuple.vector
   def normal_at(shape, p) do
     tinv = Matrix.inverse(shape.transform)
     object_point = tinv |> Matrix.mult(p)
@@ -37,10 +40,12 @@ defmodule RayTracer.Shape do
     |> RTuple.normalize
   end
 
+  @spec local_normal_at(t, RTuple.point) :: RTuple.vector
   def local_normal_at(shape, point) do
     Shadeable.local_normal_at(shape, point)
   end
 
+  @spec local_intersect(t, Ray.t) :: list(Intersection.t)
   def local_intersect(shape, ray) do
     Shadeable.local_intersect(shape, ray)
   end
