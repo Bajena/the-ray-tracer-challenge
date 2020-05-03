@@ -36,7 +36,7 @@ defmodule RayTracer.Plane do
 
     @spec local_intersect(Plane.t, Ray.t) :: list(Intersection.t)
     def local_intersect(shape, object_space_ray) do
-      if abs(object_space_ray.direction |> RTuple.y) < epsilon do
+      if abs(object_space_ray.direction |> RTuple.y) < epsilon() do
         []
       else
         t = -RTuple.y(object_space_ray.origin) / RTuple.y(object_space_ray.direction)

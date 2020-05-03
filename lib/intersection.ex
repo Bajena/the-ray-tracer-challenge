@@ -44,7 +44,7 @@ defmodule RayTracer.Intersection do
   def intersect(shape, ray) do
     object_space_ray = ray |> Ray.transform(shape.transform |> Matrix.inverse)
 
-    Shape.Shadeable.local_intersect(shape, object_space_ray)
+    Shape.local_intersect(shape, object_space_ray)
   end
 
   @doc """
@@ -84,7 +84,7 @@ defmodule RayTracer.Intersection do
       eyev: eyev,
       normalv: (if inside, do: RTuple.negate(normalv), else: normalv),
       inside: inside,
-      over_point: p |> RTuple.add(normalv |> RTuple.mul(epsilon))
+      over_point: p |> RTuple.add(normalv |> RTuple.mul(epsilon()))
     }
   end
 
