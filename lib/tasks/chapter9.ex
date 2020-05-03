@@ -39,7 +39,8 @@ defmodule RayTracer.Tasks.Chapter9 do
 
   defp build_world do
     objects = [
-      wall1, wall2, wall3, wall4, wall5, wall6, floor(), middle_sphere(), left_sphere(), right_sphere()
+      wall1(), wall2(), wall3(), wall4(), wall5(), wall6(),
+      floor(), middle_sphere(), left_sphere(), right_sphere()
     ]
     light = point_light(point(0, 4, -2), Color.new(1, 1, 1))
 
@@ -104,24 +105,6 @@ defmodule RayTracer.Tasks.Chapter9 do
       |> Matrix.mult(rotation_x(:math.pi / 2))
 
     %Plane{floor() | material: %Material{Material.new | color: Color.new(0, 0, 1), specular: 0}, transform: transform}
-  end
-
-  defp left_wall do
-    transform =
-      translation(0, 0, 4)
-      |> Matrix.mult(rotation_y(-:math.pi / 4))
-      |> Matrix.mult(rotation_x(:math.pi / 2))
-
-    %Plane{floor() | transform: transform}
-  end
-
-  defp right_wall do
-    transform =
-      translation(0, 0, 4)
-      |> Matrix.mult(rotation_y(:math.pi / 4))
-      |> Matrix.mult(rotation_x(:math.pi / 2))
-
-    %Plane{floor() | material: %Material{Material.new | color: Color.new(1, 0, 0), specular: 0}, transform: transform}
   end
 
   defp floor do

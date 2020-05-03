@@ -5,6 +5,7 @@ defmodule RayTracer.World do
 
   alias RayTracer.Light
   alias RayTracer.Sphere
+  alias RayTracer.Shape
   alias RayTracer.Material
   alias RayTracer.Transformations
   alias RayTracer.RTuple
@@ -13,7 +14,7 @@ defmodule RayTracer.World do
   alias RayTracer.Ray
 
   @type t :: %__MODULE__{
-    objects: list(Sphere.t),
+    objects: list(Shape.t),
     light: Light.t | nil
   }
 
@@ -22,7 +23,7 @@ defmodule RayTracer.World do
   @doc """
   Builds a world with given objects and light
   """
-  @spec new(list(Sphere.t), Light.t | nil) :: t
+  @spec new(list(Shape.t), Light.t | nil) :: t
   def new(objects \\ [], light \\ nil) do
     %__MODULE__{objects: objects, light: light}
   end
