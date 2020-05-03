@@ -14,6 +14,8 @@ defmodule RayTracer.Tasks.Chapter9 do
   alias RayTracer.Camera
   alias RayTracer.Matrix
 
+  @r 4
+
   import RTuple, only: [point: 3, vector: 3]
   import Light, only: [point_light: 2]
   import RayTracer.Transformations
@@ -37,17 +39,71 @@ defmodule RayTracer.Tasks.Chapter9 do
 
   defp build_world do
     objects = [
-      floor(), left_wall(), right_wall(), left_sphere(), middle_sphere(), right_sphere()
+      wall1, wall2, wall3, wall4, wall5, wall6, floor(), middle_sphere(), left_sphere(), right_sphere()
     ]
-    light = point_light(point(-10, 10, -10), Color.new(1, 1, 1))
+    light = point_light(point(0, 4, -2), Color.new(1, 1, 1))
 
     World.new(objects, light)
   end
 
   defp build_camera(w, h) do
-    transform = view_transform(point(0, 1.5, -5), point(0, 1, 0), vector(0, 1, 0))
+    transform = view_transform(point(0, 6, -1.7), point(0, 1, 0), vector(0, 1, 0))
 
     Camera.new(w, h, :math.pi / 3, transform)
+  end
+
+  defp wall1 do
+    transform =
+      translation(0, 0, @r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(0))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(1, 0, 0), specular: 0}, transform: transform}
+  end
+
+  defp wall2 do
+    transform =
+      translation(@r / 2, 0, @r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(:math.pi / 3))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(0, 1, 0), specular: 0}, transform: transform}
+  end
+
+  defp wall3 do
+    transform =
+      translation(@r / 2, 0, -@r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(2 * :math.pi / 3))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(0, 0, 1), specular: 0}, transform: transform}
+  end
+
+  defp wall4 do
+    transform =
+      translation(0, 0, -@r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(:math.pi))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(1, 0, 0), specular: 0}, transform: transform}
+  end
+
+  defp wall5 do
+    transform =
+      translation(-@r / 2, 0, -@r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(4 * :math.pi / 3))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(0, 1, 0), specular: 0}, transform: transform}
+  end
+
+  defp wall6 do
+    transform =
+      translation(-@r / 2, 0, @r * :math.sqrt(3) / 2)
+      |> Matrix.mult(rotation_y(5 * :math.pi / 3))
+      |> Matrix.mult(rotation_x(:math.pi / 2))
+
+    %Plane{floor() | material: %Material{Material.new | color: Color.new(0, 0, 1), specular: 0}, transform: transform}
   end
 
   defp left_wall do
@@ -80,7 +136,7 @@ defmodule RayTracer.Tasks.Chapter9 do
   end
 
   defp middle_sphere do
-    transform = translation(-0.5, 1, 0.5)
+    transform = translation(0, 1, 0)
     material = %Material{Material.new | color: Color.new(0.1, 1, 0.5), specular: 0.3, diffuse: 0.7}
     %Sphere{Sphere.new | material: material, transform: transform}
   end
