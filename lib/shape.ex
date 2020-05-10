@@ -6,6 +6,7 @@ defmodule RayTracer.Shape do
   alias RayTracer.RTuple
   alias RayTracer.Intersection
   alias RayTracer.Ray
+  alias RayTracer.Material
 
   defprotocol Shadeable do
     def local_normal_at(shape, object_point)
@@ -13,7 +14,10 @@ defmodule RayTracer.Shape do
   end
 
   defmacro __using__(fields \\ []) do
-    base_fields = [:transform, :material]
+    base_fields = [
+      transform: quote do Matrix.ident end,
+      material: quote do Material.new end
+    ]
     new_fields = base_fields ++ fields
     quote do
       defstruct unquote(new_fields)
