@@ -6,7 +6,7 @@ defmodule RayTracer.Light do
   alias RayTracer.RTuple
   alias RayTracer.Color
   alias RayTracer.Material
-  alias RayTracer.StripePattern
+  alias RayTracer.Pattern
   alias RayTracer.Shape
 
   import RTuple, only: [normalize: 1, reflect: 2]
@@ -67,7 +67,7 @@ defmodule RayTracer.Light do
 
   defp material_color_at(material, object, point) do
     if material.pattern do
-      material.pattern |> StripePattern.stripe_at_object(object, point)
+      material.pattern |> Pattern.pattern_at_shape(object, point)
     else
       material.color
     end
