@@ -4,9 +4,9 @@ defmodule RayTracer.StripePattern do
   """
 
   alias RayTracer.Color
-  alias RayTracer.Shape
   alias RayTracer.Matrix
   alias RayTracer.RTuple
+  alias RayTracer.Pattern
 
   @type t :: %__MODULE__{
     a: Color.t,
@@ -14,7 +14,7 @@ defmodule RayTracer.StripePattern do
     transform: Matrix.matrix
   }
 
-  defstruct [:a, :b, transform: Matrix.ident]
+  use Pattern, [:a, :b]
 
   @doc """
   Builds a new pattern with colors `a` and `b`
@@ -24,35 +24,16 @@ defmodule RayTracer.StripePattern do
     %__MODULE__{a: a, b: b, transform: transform}
   end
 
-  @doc """
-  Computes the color for the pattern on given object at the given world space
-  point with respect to the transformations on both the pattern
-  and the object.
-  """
-  @spec stripe_at_object(t, Shape.t, RTuple.point) :: Color.t
-  def stripe_at_object(pattern, object, position) do
-    object_space_point =
-      object.transform
-      |> Matrix.inverse
-      |> Matrix.mult(position)
+  defimpl Pattern.CommonProtocol do
+    alias RayTracer.{RTuple, StripePattern, Color}
 
-    pattern_space_point =
-      pattern.transform
-      |> Matrix.inverse
-      |> Matrix.mult(object_space_point)
-
-    stripe_at(pattern, pattern_space_point)
-  end
-
-  @doc """
-  Computes the color for the pattern at the point in pattern space
-  """
-  @spec stripe_at(t, RTuple.point) :: Color.t
-  def stripe_at(pattern, point) do
-    if floor(point |> RTuple.x) |> rem(2) == 0 do
-      pattern.a
-    else
-      pattern.b
+    @spec pattern_at(StripePattern.t, RTuple.point) :: Color.t
+    def pattern_at(pattern, point) do
+      if floor(point |> RTuple.x) |> rem(2) == 0 do
+        pattern.a
+      else
+        pattern.b
+      end
     end
   end
 end
