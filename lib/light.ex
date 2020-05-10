@@ -6,6 +6,8 @@ defmodule RayTracer.Light do
   alias RayTracer.RTuple
   alias RayTracer.Color
   alias RayTracer.Material
+  alias RayTracer.StripePattern
+  alias RayTracer.Shape
 
   import RTuple, only: [normalize: 1, reflect: 2]
 
@@ -34,10 +36,13 @@ defmodule RayTracer.Light do
   `normalv` - surface normal vector
   `in_shadow` - indicates whether the point is in shadow of an object
   """
-  @spec lighting(Material.t, t, RTuple.point, RTuple.vector, RTuple.vector, boolean) :: Color.t
-  def lighting(material, light, position, eyev, normalv, in_shadow) do
+  @spec lighting(Material.t, Shape.t, t, RTuple.point, RTuple.vector, RTuple.vector, boolean) :: Color.t
+  def lighting(material, object, light, position, eyev, normalv, in_shadow) do
     # Combine the surface color with the light's color/intensity
-    effective_color = material.color |> Color.hadamard_product(light.intensity)
+    effective_color =
+      material
+      |> material_color_at(object, position)
+      |> Color.hadamard_product(light.intensity)
 
     # Find the direction to the light sourc
     lightv = light.position |> RTuple.sub(position) |> normalize
@@ -57,6 +62,14 @@ defmodule RayTracer.Light do
       specular = calc_specular(light_dot_normal, lightv, normalv, eyev, material, light)
 
       ambient |> Color.add(diffuse) |> Color.add(specular)
+    end
+  end
+
+  defp material_color_at(material, object, point) do
+    if material.pattern do
+      material.pattern |> StripePattern.stripe_at_object(object, point)
+    else
+      material.color
     end
   end
 

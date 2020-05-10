@@ -328,7 +328,7 @@ defmodule RayTracer.Matrix do
     Returns a new matrix which is a multiplication of a matrix `x` and a vector
     (tuple) `t`.
     """
-  @spec mult(matrix, RTuple.vector) :: RTuple.vector
+  @spec mult(matrix, RTuple.vector | RTuple.point) :: RTuple.vector | RTuple.point
   def mult(x, t = %RayTracer.RTuple{}) do
     x |> mult(from_r_tuple(t)) |> Enum.map(&Enum.at(&1, 0)) |> RTuple.new
   end
