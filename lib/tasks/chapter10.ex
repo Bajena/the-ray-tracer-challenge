@@ -16,7 +16,7 @@ defmodule RayTracer.Tasks.Chapter10 do
   alias RayTracer.StripePattern
   alias RayTracer.GradientPattern
   alias RayTracer.RingPattern
-  alias RayTracer.CheckerPattern
+  alias RayTracer.BlendedPattern
 
   import RTuple, only: [point: 3, vector: 3]
   import Light, only: [point_light: 2]
@@ -59,13 +59,15 @@ defmodule RayTracer.Tasks.Chapter10 do
       translation(0, 0, 2.5)
       |> Matrix.mult(rotation_x(:math.pi / 2))
 
-    pattern = StripePattern.new(Color.black, Color.white, rotation_y(:math.pi / 6))
+    a = StripePattern.new(Color.black, Color.white)
+    b = StripePattern.new(Color.new_from_rgb_255(255, 0, 0), Color.white, rotation_y(:math.pi / 2))
+    pattern = %BlendedPattern{a: a, b: b, transform: rotation_z(:math.pi / 4)}
     material = %Material{specular: 0, pattern: pattern}
     %Plane{material: material, transform: transform}
   end
 
   defp floor do
-    pattern = CheckerPattern.new(Color.black, Color.white)
+    pattern = StripePattern.new(Color.black, Color.white)
     material = %Material{specular: 0, pattern: pattern}
     %Plane{material: material}
   end

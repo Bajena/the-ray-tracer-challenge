@@ -7,13 +7,25 @@ defmodule RayTracer.Pattern do
   alias RayTracer.Matrix
   alias RayTracer.RTuple
 
-  @type t :: RayTracer.StripePattern.t
+  @type t :: RayTracer.StripePattern.t |
+             RayTracer.RingPattern.t |
+             RayTracer.CheckerPattern.t |
+             RayTracer.GradientPattern.t |
+             RayTracer.BlendedPattern.t
 
   defprotocol CommonProtocol do
     @doc """
     Computes the color for the pattern at the point in pattern space
     """
-    def pattern_at(pattern, point)
+    def pattern_at(pattern, position)
+  end
+
+  defprotocol CombinationProtocol do
+    @fallback_to_any true
+    @doc """
+    Computes the color for the pattern at the point in pattern space
+    """
+    def pattern_at_shape(pattern, object, position)
   end
 
   defmacro __using__(fields \\ []) do
@@ -24,28 +36,46 @@ defmodule RayTracer.Pattern do
     end
   end
 
-  @doc """
-  Computes the color for the pattern on given object at the given world space
-  point with respect to the transformations on both the pattern
-  and the object.
-  """
+  defimpl CombinationProtocol, for: Any do
+    alias RayTracer.Color
+    alias RayTracer.Shape
+    alias RayTracer.Matrix
+    alias RayTracer.RTuple
+    alias RayTracer.Pattern
+    @doc """
+    Computes the color for the pattern on given object at the given world space
+    point with respect to the transformations on both the pattern
+    and the object.
+    """
+    @spec pattern_at_shape(Pattern.t, Shape.t, RTuple.point) :: Color.t
+    def pattern_at_shape(pattern, object, position) do
+      pattern_space_point = Pattern.pattern_space_point(pattern, object, position)
+      Pattern.pattern_at(pattern, pattern_space_point)
+    end
+  end
+
+  @spec pattern_at(t, RTuple.point) :: Color.t
+  def pattern_at(pattern, position) do
+    CommonProtocol.pattern_at(pattern, position)
+  end
+
   @spec pattern_at_shape(t, Shape.t, RTuple.point) :: Color.t
   def pattern_at_shape(pattern, object, position) do
+    CombinationProtocol.pattern_at_shape(pattern, object, position)
+  end
+
+  @doc """
+  Converts the point from world space to pattern space
+  """
+  @spec pattern_space_point(t, Shape.t, RTuple.point) :: RTuple.point
+  def pattern_space_point(pattern, object, position) do
     object_space_point =
       object.transform
       |> Matrix.inverse
       |> Matrix.mult(position)
 
-    pattern_space_point =
-      pattern.transform
-      |> Matrix.inverse
-      |> Matrix.mult(object_space_point)
-
-    pattern_at(pattern, pattern_space_point)
-  end
-
-  @spec pattern_at(t, RTuple.point) :: Color.t
-  def pattern_at(shape, point) do
-    CommonProtocol.pattern_at(shape, point)
+    pattern.transform
+    |> Matrix.inverse
+    |> Matrix.mult(object_space_point)
   end
 end
