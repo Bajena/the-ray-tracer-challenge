@@ -4,11 +4,11 @@ defmodule RayTracer.Material do
   """
 
   alias RayTracer.Color
-  alias RayTracer.StripePattern
+  alias RayTracer.Pattern
 
   @type t :: %__MODULE__{
     color: Color.t,
-    pattern: StripePattern.t | nil,
+    pattern: Pattern.t | nil,
     ambient: number,
     diffuse: number,
     specular: number,
