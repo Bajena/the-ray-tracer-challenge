@@ -64,6 +64,7 @@ defmodule RayTracer.World do
   def shade_hit(world, comps) do
     Light.lighting(
       comps.object.material,
+      comps.object,
       world.light,
       comps.over_point,
       comps.eyev,

@@ -4,12 +4,17 @@ defmodule RayTracer.Sphere do
   """
 
   alias RayTracer.Shape
-  use Shape, [:center, :r]
-
   alias RayTracer.RTuple
   alias RayTracer.Matrix
   alias RayTracer.Material
   alias RayTracer.Intersection
+
+  use Shape, [
+    center: RTuple.point(0, 0, 0),
+    r: 1,
+    transform: Matrix.ident,
+    material: Material.new
+  ]
 
   import RTuple, only: [sub: 2, dot: 2]
 

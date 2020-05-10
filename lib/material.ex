@@ -4,9 +4,11 @@ defmodule RayTracer.Material do
   """
 
   alias RayTracer.Color
+  alias RayTracer.StripePattern
 
   @type t :: %__MODULE__{
     color: Color.t,
+    pattern: StripePattern.t | nil,
     ambient: number,
     diffuse: number,
     specular: number,
@@ -14,23 +16,14 @@ defmodule RayTracer.Material do
   }
 
   defstruct [
-    color: Color.white, ambient: 0.1, diffuse: 0.9, specular: 0.9, shininess: 200
+    color: Color.white, pattern: nil, ambient: 0.1, diffuse: 0.9, specular: 0.9, shininess: 200
   ]
 
   @doc """
-  Builds a new material.
-  For ambient, diffuse and specular the typical values are between 0 and 1.
-  For shininess values between 10 (very large highlight) and 200 (very small highlight)
-  seem to work best.
+  Builds a new material with default attributes
   """
-  @spec new(Color.t, number, number, number, number) :: t
-  def new(color \\ Color.white, ambient \\ 0.1, diffuse \\ 0.9, specular \\ 0.9, shininess \\ 200) do
-    %__MODULE__{
-      color: color,
-      ambient: ambient,
-      diffuse: diffuse,
-      specular: specular,
-      shininess: shininess
-    }
+  @spec new :: t
+  def new do
+    %__MODULE__{}
   end
 end
