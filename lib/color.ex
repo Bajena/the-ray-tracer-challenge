@@ -14,6 +14,9 @@ defmodule RayTracer.Color do
   @spec new(number, number, number) :: t
   def new(r, g, b), do: RTuple.new([r, g, b])
 
+  @spec new_from_rgb_255(number, number, number) :: t
+  def new_from_rgb_255(r, g, b), do: new(r / 255, g / 255, b / 255)
+
   @spec new(list(number) | tuple) :: t
   defdelegate new(values), to: RTuple
 

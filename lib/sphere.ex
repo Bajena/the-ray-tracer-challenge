@@ -11,9 +11,7 @@ defmodule RayTracer.Sphere do
 
   use Shape, [
     center: RTuple.point(0, 0, 0),
-    r: 1,
-    transform: Matrix.ident,
-    material: Material.new
+    r: 1
   ]
 
   import RTuple, only: [sub: 2, dot: 2]
