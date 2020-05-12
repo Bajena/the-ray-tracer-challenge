@@ -17,6 +17,8 @@ defmodule RayTracer.Tasks.Chapter10 do
   alias RayTracer.GradientPattern
   alias RayTracer.RingPattern
   alias RayTracer.BlendedPattern
+  alias RayTracer.PerturbPattern
+  alias RayTracer.CheckerPattern
 
   import RTuple, only: [point: 3, vector: 3]
   import Light, only: [point_light: 2]
@@ -61,13 +63,15 @@ defmodule RayTracer.Tasks.Chapter10 do
 
     a = StripePattern.new(Color.black, Color.white)
     b = StripePattern.new(Color.new_from_rgb_255(255, 0, 0), Color.white, rotation_y(:math.pi / 2))
-    pattern = %BlendedPattern{a: a, b: b, transform: rotation_z(:math.pi / 4)}
+    blended_pattern = %BlendedPattern{a: a, b: b, transform: rotation_z(:math.pi / 4)}
+    pattern = %PerturbPattern{perturbed_pattern: blended_pattern}
     material = %Material{specular: 0, pattern: pattern}
     %Plane{material: material, transform: transform}
   end
 
   defp floor do
-    pattern = StripePattern.new(Color.black, Color.white)
+    inner = StripePattern.new(Color.black, Color.white)
+    pattern = %PerturbPattern{perturbed_pattern: inner}
     material = %Material{specular: 0, pattern: pattern}
     %Plane{material: material}
   end
@@ -81,7 +85,8 @@ defmodule RayTracer.Tasks.Chapter10 do
 
   defp middle_sphere do
     transform = translation(-0.5, 1, 0.5)
-    pattern = RingPattern.new(Color.new(1, 1, 1), Color.new_from_rgb_255(68, 112, 43), scaling(0.2, 0.2, 0.2) |> Matrix.mult(rotation_x(:math.pi / 2)))
+    ring_pattern = RingPattern.new(Color.new(1, 1, 1), Color.new_from_rgb_255(68, 112, 43), scaling(0.2, 0.2, 0.2) |> Matrix.mult(rotation_x(:math.pi / 2)))
+    pattern = %PerturbPattern{perturbed_pattern: ring_pattern}
     material = %Material{specular: 0.3, diffuse: 0.7, pattern: pattern}
     %Sphere{Sphere.new | material: material, transform: transform}
   end
