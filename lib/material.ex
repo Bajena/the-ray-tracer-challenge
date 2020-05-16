@@ -12,11 +12,18 @@ defmodule RayTracer.Material do
     ambient: number,
     diffuse: number,
     specular: number,
-    shininess: number
+    shininess: number,
+    reflective: number
   }
 
   defstruct [
-    color: Color.white, pattern: nil, ambient: 0.1, diffuse: 0.9, specular: 0.9, shininess: 200
+    color: Color.white,
+    pattern: nil,
+    ambient: 0.1,
+    diffuse: 0.9,
+    specular: 0.9,
+    shininess: 200,
+    reflective: 0.0
   ]
 
   @doc """

@@ -5,12 +5,14 @@ defmodule WorldTest do
   alias RayTracer.RTuple
   alias RayTracer.Color
   alias RayTracer.Sphere
+  alias RayTracer.Plane
   alias RayTracer.Ray
   alias RayTracer.Light
   alias RayTracer.Intersection
 
   import RayTracer.RTuple.CustomOperators
   import RTuple, only: [point: 3, vector: 3]
+  import Transformations, only: [translation: 3]
 
   use ExUnit.Case
   doctest RayTracer.World
@@ -133,5 +135,70 @@ defmodule WorldTest do
     c = w |> World.shade_hit(comps)
 
     assert c <~> Color.new(0.1, 0.1, 0.1)
+  end
+
+  test "The reflected color for a nonreflective material" do
+    dw = World.default()
+    d0 = Enum.at(dw.objects, 0)
+    shape = Enum.at(dw.objects, 1)
+
+    r = Ray.new(point(0, 0, 0), vector(0, 0, 1))
+
+    w = put_in(dw.objects, [d0, put_in(shape.material.ambient, 1)])
+
+    i = Intersection.new(1, shape)
+    comps = Intersection.prepare_computations(i, r)
+    assert World.reflected_color(w, comps) == Color.black
+  end
+
+  test "The reflected color for a reflective material" do
+    dw = World.default()
+    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    w = put_in(dw.objects, dw.objects |> List.insert_at(-1, shape))
+
+    r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
+
+    i = Intersection.new(:math.sqrt(2), shape)
+    comps = Intersection.prepare_computations(i, r)
+    assert World.reflected_color(w, comps) <~> Color.new(0.19033, 0.23792, 0.14275)
+  end
+
+  test "shade_hit() with a reflective material" do
+    dw = World.default()
+    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    w = put_in(dw.objects, dw.objects |> List.insert_at(0, shape))
+
+    r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
+
+    i = Intersection.new(:math.sqrt(2), shape)
+    comps = Intersection.prepare_computations(i, r)
+    assert World.shade_hit(w, comps) <~> Color.new(0.87676, 0.92434, 0.82917)
+  end
+
+  test "color_at() with mutually reflective surfaces" do
+    light = Light.point_light(point(0, 0, 0), Color.new(1, 1, 1))
+    lower = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 1)
+    upper = put_in(%Plane{transform: translation(0, 1, 0)}.material.reflective, 1)
+
+    w = %World{objects: [lower, upper], light: light}
+
+    r = Ray.new(point(0, 0, 0), vector(0, 1, 0))
+
+    World.color_at(w, r)
+
+    # Test that there's no infinite recursion
+    assert true
+  end
+
+  test "The reflected color at the maximum recursive depth" do
+    dw = World.default()
+    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    w = put_in(dw.objects, dw.objects |> List.insert_at(-1, shape))
+
+    r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
+
+    i = Intersection.new(:math.sqrt(2), shape)
+    comps = Intersection.prepare_computations(i, r)
+    assert World.reflected_color(w, comps, 0) == Color.black
   end
 end

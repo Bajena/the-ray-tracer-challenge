@@ -76,15 +76,17 @@ defmodule RayTracer.Intersection do
     eyev = RTuple.negate(ray.direction)
     normalv = intersection.object |> Shape.normal_at(p)
     inside = inside?(normalv, eyev)
+    final_normal_v = (if inside, do: RTuple.negate(normalv), else: normalv)
 
     %{
       t: intersection.t,
       object: intersection.object,
       point: p,
       eyev: eyev,
-      normalv: (if inside, do: RTuple.negate(normalv), else: normalv),
+      normalv: final_normal_v,
       inside: inside,
-      over_point: p |> RTuple.add(normalv |> RTuple.mul(epsilon()))
+      over_point: p |> RTuple.add(final_normal_v |> RTuple.mul(epsilon())),
+      reflectv: ray |> Ray.reflect(final_normal_v)
     }
   end
 

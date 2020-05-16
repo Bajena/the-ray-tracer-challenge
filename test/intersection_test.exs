@@ -2,6 +2,7 @@ defmodule IntersectionTest do
   alias RayTracer.RTuple
   alias RayTracer.Ray
   alias RayTracer.Sphere
+  alias RayTracer.Plane
   alias RayTracer.Intersection
   alias RayTracer.Transformations
 
@@ -58,5 +59,15 @@ defmodule IntersectionTest do
     opz = comps.over_point |> RTuple.z
     assert opz < epsilon() / 2
     assert comps.point |> RTuple.z > opz
+  end
+
+  test "Precomputing the reflection vector" do
+    r = Ray.new(point(0, 1, -1), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
+    s = %Plane{}
+
+    i = Intersection.new(:math.sqrt(2), s)
+    comps = prepare_computations(i, r)
+
+    assert comps.reflectv == vector(0, :math.sqrt(2) / 2, :math.sqrt(2) / 2)
   end
 end

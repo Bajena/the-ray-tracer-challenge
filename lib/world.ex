@@ -46,12 +46,12 @@ defmodule RayTracer.World do
   @doc """
   Computes shading for a ray hitting a world
   """
-  @spec color_at(t, Ray.t) :: Color.t
-  def color_at(world, ray) do
+  @spec color_at(t, Ray.t, integer) :: Color.t
+  def color_at(world, ray, remaining \\ 4) do
     hit = world |> ray_hit(ray)
 
     if hit do
-      world |> shade_hit(hit |> Intersection.prepare_computations(ray))
+      world |> shade_hit(hit |> Intersection.prepare_computations(ray), remaining)
     else
       Color.black
     end
@@ -60,9 +60,9 @@ defmodule RayTracer.World do
   @doc """
   Shades an intersection
   """
-  @spec shade_hit(t, Intersection.computation) :: Color.t
-  def shade_hit(world, comps) do
-    Light.lighting(
+  @spec shade_hit(t, Intersection.computation, integer) :: Color.t
+  def shade_hit(world, comps, remaining \\ 4) do
+    surface = Light.lighting(
       comps.object.material,
       comps.object,
       world.light,
@@ -71,6 +71,24 @@ defmodule RayTracer.World do
       comps.normalv,
       world |> is_shadowed(comps.over_point)
     )
+
+    reflected = world |> reflected_color(comps, remaining)
+
+    Color.add(surface, reflected)
+  end
+
+  @doc """
+  Computes a color for reflection
+  """
+  @spec reflected_color(t, Intersection.computation, integer) :: Color.t
+  def reflected_color(_, _, remaining \\ 4)
+  def reflected_color(_, _, 0), do: Color.black
+  def reflected_color(_, %{object: %{ material: %{ reflective: r }}}, _) when r == 0, do: Color.black
+  def reflected_color(world, comps, remaining) do
+    reflect_ray = Ray.new(comps.over_point, comps.reflectv)
+    color = world |> color_at(reflect_ray, remaining - 1)
+
+    color |> Color.mul(comps.object.material.reflective)
   end
 
   @doc """
