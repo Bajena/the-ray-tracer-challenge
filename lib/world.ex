@@ -83,7 +83,7 @@ defmodule RayTracer.World do
   @spec reflected_color(t, Intersection.computation, integer) :: Color.t
   def reflected_color(_, _, remaining \\ 4)
   def reflected_color(_, _, 0), do: Color.black
-  def reflected_color(_, %{object: %{ material: %{ reflective: r }}}, _) when r == 0, do: Color.black
+  def reflected_color(_, %{object: %{material: %{reflective: r }}}, _) when r == 0, do: Color.black
   def reflected_color(world, comps, remaining) do
     reflect_ray = Ray.new(comps.over_point, comps.reflectv)
     color = world |> color_at(reflect_ray, remaining - 1)

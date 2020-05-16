@@ -9,7 +9,6 @@ defmodule RayTracer.Intersection do
   alias RayTracer.Matrix
   alias RayTracer.World
 
-  import RTuple, only: [sub: 2, dot: 2]
   import RayTracer.Constants
 
   @type t :: %__MODULE__{
@@ -24,7 +23,8 @@ defmodule RayTracer.Intersection do
     eyev: RTuple.vector,
     normalv: RTuple.vector,
     inside: boolean,
-    over_point: RTuple.point
+    over_point: RTuple.point,
+    reflectv: RTuple.vector
   }
 
   defstruct [:t, :object]
