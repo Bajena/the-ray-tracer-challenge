@@ -38,4 +38,12 @@ defmodule RayTracer.Ray do
   def transform(ray, t) do
     %__MODULE__{origin: Matrix.mult(t, ray.origin), direction: Matrix.mult(t, ray.direction)}
   end
+
+  @doc """
+  Computes a reflection of ray around a normal vector
+  """
+  @spec reflect(t, RTuple.vector) :: RTuple.vector
+  def reflect(ray, normalv) do
+    ray.direction |> RTuple.reflect(normalv)
+  end
 end
