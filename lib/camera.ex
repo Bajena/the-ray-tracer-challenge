@@ -68,7 +68,7 @@ defmodule RayTracer.Camera do
 
   def compute_pixel(world, camera, x, y) do
     ray = ray_for_pixel(camera, x, y)
-    %{ x: x, color: World.color_at(world, ray) }
+    %{x: x, color: World.color_at(world, ray)}
   end
 
   @doc """
