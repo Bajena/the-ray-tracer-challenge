@@ -66,11 +66,6 @@ defmodule RayTracer.Camera do
     end)
   end
 
-  def compute_pixel(world, camera, x, y) do
-    ray = ray_for_pixel(camera, x, y)
-    %{x: x, color: World.color_at(world, ray)}
-  end
-
   @doc """
   Computes the world coordinates at the center of the given pixel and then constructs
   a ray that passes through that point.
@@ -117,5 +112,10 @@ defmodule RayTracer.Camera do
             end
 
     %{pixel_size: sizes.half_width * 2 / hsize} |> Map.merge(sizes)
+  end
+
+  defp compute_pixel(world, camera, x, y) do
+    ray = ray_for_pixel(camera, x, y)
+    %{x: x, color: World.color_at(world, ray)}
   end
 end
