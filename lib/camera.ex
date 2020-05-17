@@ -56,11 +56,12 @@ defmodule RayTracer.Camera do
     Enum.reduce(0..(camera.vsize - 1), Canvas.new(camera.hsize, camera.vsize), fn y, canvas ->
       if rem(y, 10) == 0, do: IO.puts("#{y}/#{camera.vsize}")
 
-      Enum.reduce(0..(camera.hsize - 1), canvas, fn x, canvas ->
-        ray = ray_for_pixel(camera, x, y)
-        color = World.color_at(world, ray)
-
-        canvas |> Canvas.write_pixel(x, y, color)
+      0..(camera.hsize - 1)
+      |> Flow.from_enumerable()
+      |> Flow.partition()
+      |> Flow.map(&compute_pixel(world, camera, &1, y))
+      |> Enum.reduce(canvas, fn r, canvas ->
+        canvas |> Canvas.write_pixel(r.x, y, r.color)
       end)
     end)
   end
@@ -111,5 +112,10 @@ defmodule RayTracer.Camera do
             end
 
     %{pixel_size: sizes.half_width * 2 / hsize} |> Map.merge(sizes)
+  end
+
+  defp compute_pixel(world, camera, x, y) do
+    ray = ray_for_pixel(camera, x, y)
+    %{x: x, color: World.color_at(world, ray)}
   end
 end

@@ -24,8 +24,7 @@ defmodule RayTracer.Tasks.Chapter11 do
   """
   @spec execute :: :ok
   def execute(w \\ 100, h \\ 50) do
-    # RayTracer.Tasks.Chapter11.execute
-
+    # Benchmark(fn -> RayTracer.Tasks.Chapter11.execute end)
     world = build_world()
     camera = build_camera(w, h)
 
