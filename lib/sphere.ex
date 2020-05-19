@@ -20,6 +20,8 @@ defmodule RayTracer.Sphere do
     center: RTuple.point,
     r: number,
     transform: Matrix.matrix,
+    inv_transform: Matrix.matrix,
+    trans_inv_transform: Matrix.matrix,
     material: Material.t
   }
 
@@ -56,7 +58,7 @@ defmodule RayTracer.Sphere do
   """
   @spec new(RTuple.point, number) :: t
   def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident, material \\ Material.new) do
-    %__MODULE__{center: center, r: radius, transform: transform, material: material}
+    %__MODULE__{center: center, r: radius, material: material} |> set_transform(transform)
   end
 
   @doc """

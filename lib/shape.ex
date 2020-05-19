@@ -16,6 +16,8 @@ defmodule RayTracer.Shape do
   defmacro __using__(fields \\ []) do
     base_fields = [
       transform: quote do Matrix.ident end,
+      inv_transform: quote do Matrix.ident end,
+      trans_inv_transform: quote do Matrix.ident end,
       material: quote do Material.new end
     ]
     new_fields = base_fields ++ fields
@@ -23,7 +25,7 @@ defmodule RayTracer.Shape do
       defstruct unquote(new_fields)
 
       def set_transform(s, t) do
-        %__MODULE__{s | transform: t}
+        RayTracer.Shape.set_transform(s, t)
       end
     end
   end
@@ -32,13 +34,12 @@ defmodule RayTracer.Shape do
 
   @spec normal_at(t, RTuple.point) :: RTuple.vector
   def normal_at(shape, p) do
-    tinv = Matrix.inverse(shape.transform)
+    tinv = shape.inv_transform
     object_point = tinv |> Matrix.mult(p)
 
     object_normal = Shadeable.local_normal_at(shape, object_point)
 
-    tinv
-    |> Matrix.transpose
+    shape.trans_inv_transform
     |> Matrix.mult(object_normal)
     |> RTuple.set_w(0)
     |> RTuple.normalize
@@ -52,5 +53,12 @@ defmodule RayTracer.Shape do
   @spec local_intersect(t, Ray.t) :: list(Intersection.t)
   def local_intersect(shape, ray) do
     Shadeable.local_intersect(shape, ray)
+  end
+
+  def set_transform(s, t) do
+    tinv = Matrix.inverse(t)
+    trans_inv_transform = tinv |> Matrix.transpose
+
+    s |> struct!(transform: t, inv_transform: tinv, trans_inv_transform: trans_inv_transform)
   end
 end

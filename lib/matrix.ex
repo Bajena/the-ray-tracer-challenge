@@ -261,6 +261,7 @@ defmodule RayTracer.Matrix do
     """
   @spec inverse(matrix) :: matrix
   def inverse(m) do
+    Counter.increment()
     d = det(m)
 
     {rows, cols} = size(m)

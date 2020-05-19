@@ -42,7 +42,7 @@ defmodule RayTracer.Intersection do
   """
   @spec intersect(Shape.t, Ray.t) :: list(t)
   def intersect(shape, ray) do
-    object_space_ray = ray |> Ray.transform(shape.transform |> Matrix.inverse)
+    object_space_ray = ray |> Ray.transform(shape.inv_transform)
 
     Shape.local_intersect(shape, object_space_ray)
   end

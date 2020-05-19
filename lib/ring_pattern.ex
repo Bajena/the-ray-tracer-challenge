@@ -21,7 +21,7 @@ defmodule RayTracer.RingPattern do
   """
   @spec new(Color.t, Color.t, Matrix.matrix) :: t
   def new(a, b, transform \\ Matrix.ident) do
-    %__MODULE__{a: a, b: b, transform: transform}
+    %__MODULE__{a: a, b: b} |> Pattern.set_transform(transform)
   end
 
   defimpl Pattern.CommonProtocol do

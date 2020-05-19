@@ -29,7 +29,7 @@ defmodule RayTracer.Pattern do
   end
 
   defmacro __using__(fields \\ []) do
-    base_fields = [transform: Matrix.ident]
+    base_fields = [transform: Matrix.ident, inv_transform: Matrix.ident]
     new_fields = base_fields ++ fields
     quote do
       defstruct unquote(new_fields)
@@ -70,12 +70,14 @@ defmodule RayTracer.Pattern do
   @spec pattern_space_point(t, Shape.t, RTuple.point) :: RTuple.point
   def pattern_space_point(pattern, object, position) do
     object_space_point =
-      object.transform
-      |> Matrix.inverse
+      object.inv_transform
       |> Matrix.mult(position)
 
-    pattern.transform
-    |> Matrix.inverse
+    pattern.inv_transform
     |> Matrix.mult(object_space_point)
+  end
+
+  def set_transform(pattern, transform) do
+    pattern |> struct!(transform: transform, inv_transform: transform |> Matrix.inverse)
   end
 end
