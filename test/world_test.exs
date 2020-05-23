@@ -5,6 +5,7 @@ defmodule WorldTest do
   alias RayTracer.RTuple
   alias RayTracer.Color
   alias RayTracer.Sphere
+  alias RayTracer.Shape
   alias RayTracer.Plane
   alias RayTracer.Ray
   alias RayTracer.Light
@@ -28,7 +29,7 @@ defmodule WorldTest do
     material = %Material{Material.new | color: Color.new(0.8, 1.0, 0.6), diffuse: 0.7, specular: 0.2}
     s1 = %Sphere{Sphere.new | material: material}
 
-    s2 = %Sphere{Sphere.new | transform: Transformations.scaling(0.5, 0.5, 0.5)}
+    s2 = Sphere.new |> Shape.set_transform(Transformations.scaling(0.5, 0.5, 0.5))
 
     light = Light.point_light(RTuple.point(-10, 10, -10), Color.white)
     w = World.default()
@@ -153,7 +154,7 @@ defmodule WorldTest do
 
   test "The reflected color for a reflective material" do
     dw = World.default()
-    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    shape = put_in(%Plane{}.material.reflective, 0.5) |> Shape.set_transform(translation(0, -1, 0))
     w = put_in(dw.objects, dw.objects |> List.insert_at(-1, shape))
 
     r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
@@ -165,7 +166,7 @@ defmodule WorldTest do
 
   test "shade_hit() with a reflective material" do
     dw = World.default()
-    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    shape = put_in(%Plane{}.material.reflective, 0.5) |> Shape.set_transform(translation(0, -1, 0))
     w = put_in(dw.objects, dw.objects |> List.insert_at(0, shape))
 
     r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
@@ -177,8 +178,8 @@ defmodule WorldTest do
 
   test "color_at() with mutually reflective surfaces" do
     light = Light.point_light(point(0, 0, 0), Color.new(1, 1, 1))
-    lower = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 1)
-    upper = put_in(%Plane{transform: translation(0, 1, 0)}.material.reflective, 1)
+    lower = put_in(%Plane{}.material.reflective, 1) |> Shape.set_transform(translation(0, -1, 0))
+    upper = put_in(%Plane{}.material.reflective, 1) |> Shape.set_transform(translation(0, 1, 0))
 
     w = %World{objects: [lower, upper], light: light}
 
@@ -192,7 +193,7 @@ defmodule WorldTest do
 
   test "The reflected color at the maximum recursive depth" do
     dw = World.default()
-    shape = put_in(%Plane{transform: translation(0, -1, 0)}.material.reflective, 0.5)
+    shape = put_in(%Plane{}.material.reflective, 0.5) |> Shape.set_transform(translation(0, -1, 0))
     w = put_in(dw.objects, dw.objects |> List.insert_at(-1, shape))
 
     r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))

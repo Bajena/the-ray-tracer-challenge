@@ -36,7 +36,7 @@ defmodule RayTracer.World do
     material = %Material{Material.new | color: Color.new(0.8, 1.0, 0.6), diffuse: 0.7, specular: 0.2}
     s1 = %Sphere{Sphere.new | material: material}
 
-    s2 = %Sphere{Sphere.new | transform: Transformations.scaling(0.5, 0.5, 0.5)}
+    s2 = Sphere.new |> Shape.set_transform(Transformations.scaling(0.5, 0.5, 0.5))
 
     light = Light.point_light(RTuple.point(-10, 10, -10), Color.white)
 
