@@ -8,8 +8,9 @@ defmodule IntersectionTest do
   alias RayTracer.Transformations
 
   import RTuple, only: [point: 3, vector: 3]
-  import Intersection, only: [prepare_computations: 2]
+  import Intersection, only: [prepare_computations: 2, intersections: 1]
   import RayTracer.Constants
+  import Transformations, only: [scaling: 3, translation: 3]
 
   use ExUnit.Case
   doctest RayTracer.Intersection
@@ -71,4 +72,74 @@ defmodule IntersectionTest do
 
     assert comps.reflectv == vector(0, :math.sqrt(2) / 2, :math.sqrt(2) / 2)
   end
+
+  combinations = [
+    {0, 1.0, 1.5},
+    {1, 1.5, 2.0},
+    {2, 2.0, 2.5},
+    {3, 2.5, 2.5},
+    {4, 2.5, 1.5},
+    {5, 1.5, 1.0}
+  ]
+
+  for {index, n1, n2} <- combinations do
+    test "Finding n1 and n2 at various intersections (#{index}, #{n1}, #{n2})" do
+      index = unquote(index)
+      n1 = unquote(n1)
+      n2 = unquote(n2)
+
+      a =
+        put_in(Sphere.glass_sphere().material.refractive_index, 1.5)
+        |> Shape.set_transform(scaling(2, 2, 2))
+
+      b =
+        put_in(Sphere.glass_sphere().material.refractive_index, 2.0)
+        |> Shape.set_transform(translation(0, 0, -0.25))
+
+      c =
+        put_in(Sphere.glass_sphere().material.refractive_index, 2.5)
+        |> Shape.set_transform(translation(0, 0, 0.25))
+
+      r = Ray.new(point(0, 0, -4), vector(0, 0, 1))
+      xs = intersections([
+        {2, a},
+        {2.75, b},
+        {3.25, c},
+        {4.75, b},
+        {5.25, c},
+        {6, a}
+      ])
+
+      i = Enum.at(xs, index)
+      comps = prepare_computations(i, r)
+
+      assert comps.n1 == n1
+      assert comps.n2 == n2
+    end
+  end
+
+# Scenario Outline: Finding n1 and n2 at various intersections
+#   Given A ← glass_sphere() with:
+#       | transform                 | scaling(2, 2, 2) |
+#       | material.refractive_index | 1.5              |
+#     And B ← glass_sphere() with:
+#       | transform                 | translation(0, 0, -0.25) |
+#       | material.refractive_index | 2.0                      |
+#     And C ← glass_sphere() with:
+#       | transform                 | translation(0, 0, 0.25) |
+#       | material.refractive_index | 2.5                     |
+#     And r ← ray(point(0, 0, -4), vector(0, 0, 1))
+#     And xs ← intersections(2:A, 2.75:B, 3.25:C, 4.75:B, 5.25:C, 6:A)
+#   When comps ← prepare_computations(xs[<index>], r, xs)
+#   Then comps.n1 = <n1>
+#     And comps.n2 = <n2>
+
+#   Examples:
+#     | index | n1  | n2  |
+#     | 0     | 1.0 | 1.5 |
+#     | 1     | 1.5 | 2.0 |
+#     | 2     | 2.0 | 2.5 |
+#     | 3     | 2.5 | 2.5 |
+#     | 4     | 2.5 | 1.5 |
+#     | 5     | 1.5 | 1.0 |
 end

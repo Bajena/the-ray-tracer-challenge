@@ -13,6 +13,12 @@ defmodule SphereTest do
   use ExUnit.Case
   doctest RayTracer.Sphere
 
+  test "A helper for producing a sphere with a glassy material" do
+    s = Sphere.glass_sphere()
+    assert s.material.transparency == 1.0
+    assert s.material.refractive_index == 1.5
+  end
+
   test "A ray intersects a sphere at two points" do
     r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
     s = Sphere.new()

@@ -48,10 +48,14 @@ defmodule RayTracer.World do
   """
   @spec color_at(t, Ray.t, integer) :: Color.t
   def color_at(world, ray, remaining \\ 4) do
-    hit = world |> ray_hit(ray)
+    xs = world
+    |> Intersection.intersect_world(ray)
+
+    hit = xs |> Intersection.hit()
 
     if hit do
-      world |> shade_hit(hit |> Intersection.prepare_computations(ray), remaining)
+      comps = Intersection.prepare_computations(hit, ray, xs)
+      world |> shade_hit(comps, remaining)
     else
       Color.black
     end

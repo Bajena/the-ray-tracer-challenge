@@ -6,7 +6,6 @@ defmodule RayTracer.Intersection do
   alias RayTracer.Shape
   alias RayTracer.Ray
   alias RayTracer.RTuple
-  alias RayTracer.Matrix
   alias RayTracer.World
 
   import RayTracer.Constants
@@ -15,6 +14,8 @@ defmodule RayTracer.Intersection do
     t: number,
     object: Shape.t
   }
+
+  @type intersections :: list(t)
 
   @type computation :: %{
     t: number,
@@ -38,9 +39,19 @@ defmodule RayTracer.Intersection do
   end
 
   @doc """
+  Builds intersectons
+  """
+  @spec intersections(list({number, Shape.t})) :: intersections
+  def intersections(xs) do
+    xs |> Enum.map(
+      fn ({t, s}) -> new(t, s) end
+    )
+  end
+
+  @doc """
   Builds an intersection of ray with shape at distance `t`
   """
-  @spec intersect(Shape.t, Ray.t) :: list(t)
+  @spec intersect(Shape.t, Ray.t) :: intersections
   def intersect(shape, ray) do
     object_space_ray = ray |> Ray.transform(shape.inv_transform)
 
@@ -50,7 +61,7 @@ defmodule RayTracer.Intersection do
   @doc """
   Builds an intersection of ray with world `w`
   """
-  @spec intersect_world(World.t, Ray.t) :: list(t)
+  @spec intersect_world(World.t, Ray.t) :: intersections
   def intersect_world(world, ray) do
     world.objects
     |> Enum.flat_map(&intersect(&1, ray))
@@ -60,7 +71,7 @@ defmodule RayTracer.Intersection do
   @doc """
   Returns a first non-negative intersection from intersections list
   """
-  @spec hit(list(t)) :: t | nil
+  @spec hit(intersections) :: t | nil
   def hit(intersections) do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)
@@ -70,8 +81,11 @@ defmodule RayTracer.Intersection do
   @doc """
   Prepares data for shading computations
   """
-  @spec prepare_computations(t, Ray.t) :: computation
+  @spec prepare_computations(t, Ray.t, intersections) :: computation
   def prepare_computations(intersection, ray) do
+    prepare_computations(intersection, ray, [intersection])
+  end
+  def prepare_computations(intersection, ray, xs) do
     p = ray |> Ray.position(intersection.t)
     eyev = RTuple.negate(ray.direction)
     normalv = intersection.object |> Shape.normal_at(p)

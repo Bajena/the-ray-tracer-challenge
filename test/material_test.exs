@@ -25,6 +25,8 @@ defmodule MaterialTest do
     assert m.diffuse == 0.9
     assert m.specular == 0.9
     assert m.shininess == 200.0
+    assert m.transparency == 0.0
+    assert m.refractive_index == 1.0
   end
 
   test "Lighting with the eye between the light and the surface", context do
