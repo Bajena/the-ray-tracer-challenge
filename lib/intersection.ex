@@ -72,13 +72,11 @@ defmodule RayTracer.Intersection do
 
   @doc """
   Returns a first non-negative intersection from intersections list.
-  Assumes that intersections list is sorted by t.
   """
   @spec hit(intersections) :: t | nil
   def hit(intersections) do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)
-    |> Enum.at(0)
     |> Enum.min_by(&(&1.t), fn -> nil end)
   end
 
