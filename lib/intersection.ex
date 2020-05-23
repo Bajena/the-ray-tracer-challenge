@@ -25,7 +25,9 @@ defmodule RayTracer.Intersection do
     normalv: RTuple.vector,
     inside: boolean,
     over_point: RTuple.point,
-    reflectv: RTuple.vector
+    reflectv: RTuple.vector,
+    n1: number,
+    n2: number
   }
 
   defstruct [:t, :object]
@@ -69,12 +71,14 @@ defmodule RayTracer.Intersection do
   end
 
   @doc """
-  Returns a first non-negative intersection from intersections list
+  Returns a first non-negative intersection from intersections list.
+  Assumes that intersections list is sorted by t.
   """
   @spec hit(intersections) :: t | nil
   def hit(intersections) do
     intersections
     |> Enum.reject(fn(i) -> i.t < 0 end)
+    |> Enum.at(0)
     |> Enum.min_by(&(&1.t), fn -> nil end)
   end
 
@@ -92,6 +96,8 @@ defmodule RayTracer.Intersection do
     inside = inside?(normalv, eyev)
     final_normal_v = (if inside, do: RTuple.negate(normalv), else: normalv)
 
+    {n1, n2} = intersection |> comp_n1_n2(xs)
+
     %{
       t: intersection.t,
       object: intersection.object,
@@ -100,7 +106,9 @@ defmodule RayTracer.Intersection do
       normalv: final_normal_v,
       inside: inside,
       over_point: p |> RTuple.add(final_normal_v |> RTuple.mul(epsilon())),
-      reflectv: ray |> Ray.reflect(final_normal_v)
+      reflectv: ray |> Ray.reflect(final_normal_v),
+      n1: n1,
+      n2: n2
     }
   end
 
@@ -108,5 +116,46 @@ defmodule RayTracer.Intersection do
   @spec inside?(RTuple.vector, RTuple.vector) :: boolean
   defp inside?(normalv, eyev) do
     RTuple.dot(normalv, eyev) < 0
+  end
+
+  # Given a hit and a list of intersections computes refractive indices of the
+  # materials on either side of a ray-object intersection with:
+  # n1 - belonging to the material being exited
+  # n2 - belonging to the material being entered
+  @spec comp_n1_n2(t, intersections) :: {number, number}
+  defp comp_n1_n2(intersection, xs) do
+    comp_n1_n2(intersection, xs, 1,  1, [])
+  end
+  defp comp_n1_n2(_intersection, [], n1, n2, _containers), do: {n1, n2}
+  defp comp_n1_n2(intersection, [i | rest_xs], n1, n2, containers) do
+    n1_new = calc_new_n(n1, i, intersection, containers)
+
+    containers_new = append_or_remove(containers, i.object)
+
+    n2_new = calc_new_n(n2, i, intersection, containers_new)
+
+    comp_n1_n2(intersection, rest_xs, n1_new, n2_new, containers_new)
+  end
+
+  defp calc_new_n(current_n, i, intersection, containers) do
+    if i == intersection do
+      if containers |> Enum.empty? do
+        1
+      else
+        Enum.at(containers, -1).material.refractive_index
+      end
+    else
+      current_n
+    end
+  end
+
+  defp append_or_remove(containers, object) do
+    index = containers |> Enum.find_index(fn x -> x == object end)
+
+    if index do
+      containers |> List.delete_at(index)
+    else
+      containers |> List.insert_at(-1, object)
+    end
   end
 end
