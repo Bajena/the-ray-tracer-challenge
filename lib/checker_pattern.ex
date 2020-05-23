@@ -11,7 +11,8 @@ defmodule RayTracer.CheckerPattern do
   @type t :: %__MODULE__{
     a: Color.t,
     b: Color.t,
-    transform: Matrix.matrix
+    transform: Matrix.matrix,
+    inv_transform: Matrix.matrix
   }
 
   use Pattern, [:a, :b]
@@ -21,7 +22,7 @@ defmodule RayTracer.CheckerPattern do
   """
   @spec new(Color.t, Color.t, Matrix.matrix) :: t
   def new(a, b, transform \\ Matrix.ident) do
-    %__MODULE__{a: a, b: b, transform: transform}
+    %__MODULE__{a: a, b: b} |> Pattern.set_transform(transform)
   end
 
   defimpl Pattern.CommonProtocol do

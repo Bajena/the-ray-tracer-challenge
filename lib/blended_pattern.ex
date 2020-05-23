@@ -11,7 +11,8 @@ defmodule RayTracer.BlendedPattern do
   @type t :: %__MODULE__{
     a: Pattern.t,
     b: Pattern.t,
-    transform: Matrix.matrix
+    transform: Matrix.matrix,
+    inv_transform: Matrix.matrix
   }
 
   use Pattern, [:a, :b]
@@ -21,7 +22,7 @@ defmodule RayTracer.BlendedPattern do
   """
   @spec new(Pattern.t, Pattern.t, Matrix.matrix) :: t
   def new(a, b, transform \\ Matrix.ident) do
-    %__MODULE__{a: a, b: b, transform: transform}
+    %__MODULE__{a: a, b: b} |> Pattern.set_transform(transform)
   end
 
   defimpl Pattern.CombinationProtocol do
@@ -34,8 +35,7 @@ defmodule RayTracer.BlendedPattern do
     @spec pattern_at_shape(Pattern.t, Shape.t, RTuple.point) :: Color.t
     def pattern_at_shape(pattern, object, position) do
       p =
-        pattern.transform
-        |> Matrix.inverse
+        pattern.inv_transform
         |> Matrix.mult(position)
 
       pspa = Pattern.pattern_space_point(pattern.a, object, p)

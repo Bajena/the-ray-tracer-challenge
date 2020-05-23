@@ -19,13 +19,14 @@ defmodule RayTracer.Camera do
     vsize: integer,
     field_of_view: number,
     transform: Matrix.matrix,
+    inv_transform: Matrix.matrix,
     half_width: number,
     half_height: number,
     pixel_size: number
   }
 
   defstruct [
-    :hsize, :vsize, :field_of_view, :transform, :half_width, :half_height, :pixel_size
+    :hsize, :vsize, :field_of_view, :transform, :inv_transform, :half_width, :half_height, :pixel_size
   ]
 
   @doc """
@@ -37,6 +38,7 @@ defmodule RayTracer.Camera do
                     magnifying a smaller area of the scene.
   `transform` - matrix describing how the world should be oriented relative to the
                 camera. This is usually a view transformation matrix.
+  `inv_transform` - inversion of computation matrix
   """
   @spec new(integer, integer, number, Matrix.matrix) :: t
   def new(hsize, vsize, field_of_view, transform \\ Matrix.ident) do
@@ -44,7 +46,8 @@ defmodule RayTracer.Camera do
       hsize: hsize,
       vsize: vsize,
       field_of_view: field_of_view,
-      transform: transform
+      transform: transform,
+      inv_transform: Matrix.inverse(transform)
     } |> Map.merge(compute_sizes(hsize, vsize, field_of_view))
   end
 
@@ -86,7 +89,7 @@ defmodule RayTracer.Camera do
     # Using the camera matrix transform the canvas point and the origin.
     # Then compute the ray's direction vector.
     # Remember that the canvas is at z = -1
-    invct = Matrix.inverse(camera.transform)
+    invct = camera.inv_transform
     world_point = point(world_x, world_y, -1)
     pixel = invct |> Matrix.mult(world_point)
     origin = invct |> Matrix.mult(point(0, 0, 0))

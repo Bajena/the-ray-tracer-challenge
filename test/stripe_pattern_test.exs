@@ -4,6 +4,7 @@ defmodule StripePatternTest do
   alias RayTracer.StripePattern
   alias RayTracer.Pattern
   alias RayTracer.Sphere
+  alias RayTracer.Shape
   alias RayTracer.Transformations
 
   import Pattern, only: [pattern_at: 2, pattern_at_shape: 3]
@@ -48,14 +49,14 @@ defmodule StripePatternTest do
 
   test "Stripes with an object transformation" do
     pattern = StripePattern.new(Color.white, Color.black)
-    object = %Sphere{transform: scaling(2, 2, 2)}
+    object = %Sphere{} |> Shape.set_transform(scaling(2, 2, 2))
 
     assert pattern |> pattern_at_shape(object, point(1.5, 0, 0)) == Color.white
   end
 
   test "Stripes with both an object and a pattern transformation" do
     pattern = StripePattern.new(Color.white, Color.black, translation(0.5, 0, 0))
-    object = %Sphere{transform: scaling(2, 2, 2)}
+    object = %Sphere{} |> Shape.set_transform(scaling(2, 2, 2))
 
     assert pattern |> pattern_at_shape(object, point(2.5, 0, 0)) == Color.white
   end

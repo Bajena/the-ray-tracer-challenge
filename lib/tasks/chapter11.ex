@@ -4,6 +4,7 @@ defmodule RayTracer.Tasks.Chapter11 do
   """
 
   alias RayTracer.RTuple
+  alias RayTracer.Shape
   alias RayTracer.Sphere
   alias RayTracer.Plane
   alias RayTracer.Canvas
@@ -59,18 +60,18 @@ defmodule RayTracer.Tasks.Chapter11 do
   defp left_sphere do
     transform = translation(-1.5, 0.33, -0.75) |> Matrix.mult(scaling(0.33, 0.33, 0.33))
     material = %Material{Material.new | color: Color.new(1, 0.8, 0.1), specular: 0.3, diffuse: 0.7}
-    %Sphere{Sphere.new | material: material, transform: transform}
+    %Sphere{Sphere.new | material: material} |> Shape.set_transform(transform)
   end
 
   defp middle_sphere do
     transform = translation(-0.5, 1, 0.5)
     material = %Material{specular: 0.3, diffuse: 0.7, color: Color.new(1, 0, 0)}
-    %Sphere{Sphere.new | material: material, transform: transform}
+    %Sphere{Sphere.new | material: material} |> Shape.set_transform(transform)
   end
 
   defp right_sphere do
     transform = translation(1.5, 0.5, -0.5) |> Matrix.mult(scaling(0.5, 0.5, 0.5))
     material = %Material{specular: 0.3, diffuse: 0.7}
-    %Sphere{Sphere.new | material: material, transform: transform}
+    %Sphere{Sphere.new | material: material} |> Shape.set_transform(transform)
   end
 end
