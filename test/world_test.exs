@@ -127,7 +127,7 @@ defmodule WorldTest do
   test "shade_hit() is given an intersection in shadow" do
     light = Light.point_light(point(0, 0, -10), Color.new(1, 1, 1))
     s1 = Sphere.new
-    s2 = Sphere.new |> Sphere.set_transform(Transformations.translation(0, 0, 10))
+    s2 = Sphere.new |> Shape.set_transform(Transformations.translation(0, 0, 10))
     w = World.new([s1, s2], light)
 
     r = Ray.new(point(0, 0, 5), vector(0, 0, 1))

@@ -2,6 +2,7 @@ defmodule IntersectionTest do
   alias RayTracer.RTuple
   alias RayTracer.Ray
   alias RayTracer.Sphere
+  alias RayTracer.Shape
   alias RayTracer.Plane
   alias RayTracer.Intersection
   alias RayTracer.Transformations
@@ -51,7 +52,7 @@ defmodule IntersectionTest do
 
   test "The hit should offset the point" do
     r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
-    s = Sphere.new |> Sphere.set_transform(Transformations.translation(0, 0, 1))
+    s = Sphere.new |> Shape.set_transform(Transformations.translation(0, 0, 1))
 
     i = Intersection.new(5, s)
     comps = prepare_computations(i, r)

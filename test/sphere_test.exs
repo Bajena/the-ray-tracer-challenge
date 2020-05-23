@@ -3,6 +3,7 @@ defmodule SphereTest do
   alias RayTracer.Matrix
   alias RayTracer.Ray
   alias RayTracer.Sphere
+  alias RayTracer.Shape
   alias RayTracer.Intersection
   import RTuple, only: [point: 3, vector: 3]
   import Intersection, only: [intersect: 2, hit: 1]
@@ -117,12 +118,12 @@ defmodule SphereTest do
   test "Changing a sphere's transformation" do
     s = Sphere.new()
     t = translation(2, 3, 4)
-    assert Sphere.set_transform(s, t).transform == t
+    assert Shape.set_transform(s, t).transform == t
   end
 
   test "Intersecting a scaled sphere with a ray" do
     r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
-    s = Sphere.new() |> Sphere.set_transform(scaling(2, 2, 2))
+    s = Sphere.new() |> Shape.set_transform(scaling(2, 2, 2))
     xs = intersect(s, r)
 
     assert length(xs) == 2
@@ -132,7 +133,7 @@ defmodule SphereTest do
 
   test "Intersecting a translated sphere with a ray" do
     r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
-    s = Sphere.new() |> Sphere.set_transform(translation(5, 0, 0))
+    s = Sphere.new() |> Shape.set_transform(translation(5, 0, 0))
     xs = intersect(s, r)
 
     assert Enum.empty?(xs)
@@ -163,7 +164,7 @@ defmodule SphereTest do
   end
 
   test "Computing the normal on a translated sphere" do
-    s = Sphere.new() |> Sphere.set_transform(translation(0, 1, 0))
+    s = Sphere.new() |> Shape.set_transform(translation(0, 1, 0))
     n = s |> Sphere.normal_at(point(0, 1.70711, -0.70711))
 
     assert n <~> vector(0, 0.70711, -0.70711)
@@ -171,7 +172,7 @@ defmodule SphereTest do
 
   test "Computing the normal on a transformed sphere" do
     t = scaling(1, 0.5, 1) |> Matrix.mult(rotation_z(:math.pi / 5))
-    s = Sphere.new() |> Sphere.set_transform(t)
+    s = Sphere.new() |> Shape.set_transform(t)
     n = s |> Sphere.normal_at(point(0, :math.sqrt(2) / 2, -:math.sqrt(2) / 2))
 
     assert n <~> vector(0, 0.97014, -0.24254)

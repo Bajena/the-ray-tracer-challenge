@@ -33,7 +33,6 @@ defmodule RayTracer.Tasks.Chapter11 do
     |> Camera.render(world)
     |> Canvas.export_to_ppm_file
 
-    IO.puts("Counter: #{Counter.value}")
     :ok
   end
 
