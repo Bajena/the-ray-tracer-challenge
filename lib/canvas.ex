@@ -61,7 +61,7 @@ defmodule RayTracer.Canvas do
     row
     |> Enum.map(&color_to_ppm/1)
     |> Enum.join(" ")
-    # |> break_ppm_line
+    |> break_ppm_line
   end
 
   @spec break_ppm_line(String.t) :: String.t
