@@ -11,7 +11,8 @@ defmodule RayTracer.BlendedPattern do
   @type t :: %__MODULE__{
     a: Pattern.t,
     b: Pattern.t,
-    transform: Matrix.matrix
+    transform: Matrix.matrix,
+    inv_transform: Matrix.matrix
   }
 
   use Pattern, [:a, :b]

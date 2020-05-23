@@ -25,7 +25,7 @@ defmodule RayTracer.Plane do
   """
   @spec new(Matrix.matrix, Material.t) :: t
   def new(transform \\ Matrix.ident, material \\ Material.new) do
-    %__MODULE__{material: material} |> set_transform(transform)
+    %__MODULE__{material: material} |> Shape.set_transform(transform)
   end
 
   defimpl Shape.Shadeable do

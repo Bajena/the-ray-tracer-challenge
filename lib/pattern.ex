@@ -77,6 +77,7 @@ defmodule RayTracer.Pattern do
     |> Matrix.mult(object_space_point)
   end
 
+  @spec set_transform(t, Matrix.matrix) :: t
   def set_transform(pattern, transform) do
     pattern |> struct!(transform: transform, inv_transform: transform |> Matrix.inverse)
   end

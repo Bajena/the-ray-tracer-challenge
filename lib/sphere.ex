@@ -58,7 +58,7 @@ defmodule RayTracer.Sphere do
   """
   @spec new(RTuple.point, number) :: t
   def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident, material \\ Material.new) do
-    %__MODULE__{center: center, r: radius, material: material} |> set_transform(transform)
+    %__MODULE__{center: center, r: radius, material: material} |> Shape.set_transform(transform)
   end
 
   @doc """

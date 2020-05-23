@@ -11,7 +11,8 @@ defmodule RayTracer.CheckerPattern do
   @type t :: %__MODULE__{
     a: Color.t,
     b: Color.t,
-    transform: Matrix.matrix
+    transform: Matrix.matrix,
+    inv_transform: Matrix.matrix
   }
 
   use Pattern, [:a, :b]

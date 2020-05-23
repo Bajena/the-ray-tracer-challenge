@@ -23,10 +23,6 @@ defmodule RayTracer.Shape do
     new_fields = base_fields ++ fields
     quote do
       defstruct unquote(new_fields)
-
-      def set_transform(s, t) do
-        RayTracer.Shape.set_transform(s, t)
-      end
     end
   end
 
@@ -55,6 +51,7 @@ defmodule RayTracer.Shape do
     Shadeable.local_intersect(shape, ray)
   end
 
+  @spec set_transform(t, Matrix.matrix) :: t
   def set_transform(s, t) do
     tinv = Matrix.inverse(t)
     trans_inv_transform = tinv |> Matrix.transpose

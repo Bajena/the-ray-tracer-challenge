@@ -1,4 +1,8 @@
 defmodule Counter do
+  @moduledoc """
+  This module is a simple counting utility
+  """
+
   use Agent
 
   def start_link(initial_value) do
