@@ -56,9 +56,18 @@ defmodule RayTracer.Sphere do
   @doc """
   Builds a sphere with given `center`, radius `r` and transformation matrix
   """
-  @spec new(RTuple.point, number) :: t
-  def new(center \\ RTuple.point(0, 0, 0), radius \\ 1, transform \\ Matrix.ident, material \\ Material.new) do
-    %__MODULE__{center: center, r: radius, material: material} |> Shape.set_transform(transform)
+  @spec new(Matrix.matrix, Material.t) :: t
+  def new(transform \\ Matrix.ident, material \\ Material.new) do
+    %__MODULE__{material: material} |> Shape.set_transform(transform)
+  end
+
+  @doc """
+  Builds a glassy sphere
+  """
+  @spec glass_sphere() :: t
+  def glass_sphere() do
+    s = put_in(new().material.transparency, 1.0)
+    put_in(s.material.refractive_index, 1.5)
   end
 
   @doc """

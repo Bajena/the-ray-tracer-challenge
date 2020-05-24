@@ -13,7 +13,9 @@ defmodule RayTracer.Material do
     diffuse: number,
     specular: number,
     shininess: number,
-    reflective: number
+    reflective: number,
+    transparency: number,
+    refractive_index: number
   }
 
   defstruct [
@@ -23,7 +25,9 @@ defmodule RayTracer.Material do
     diffuse: 0.9,
     specular: 0.9,
     shininess: 200,
-    reflective: 0.0
+    reflective: 0.0,
+    transparency: 0.0,
+    refractive_index: 1
   ]
 
   @doc """
