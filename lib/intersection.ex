@@ -24,6 +24,7 @@ defmodule RayTracer.Intersection do
     eyev: RTuple.vector,
     normalv: RTuple.vector,
     inside: boolean,
+    under_point: RTuple.point,
     over_point: RTuple.point,
     reflectv: RTuple.vector,
     n1: number,
@@ -95,6 +96,8 @@ defmodule RayTracer.Intersection do
     final_normal_v = (if inside, do: RTuple.negate(normalv), else: normalv)
 
     {n1, n2} = intersection |> comp_n1_n2(xs)
+    over_under_diff = final_normal_v |> RTuple.mul(epsilon())
+
 
     %{
       t: intersection.t,
@@ -103,7 +106,8 @@ defmodule RayTracer.Intersection do
       eyev: eyev,
       normalv: final_normal_v,
       inside: inside,
-      over_point: p |> RTuple.add(final_normal_v |> RTuple.mul(epsilon())),
+      over_point: p |> RTuple.add(over_under_diff),
+      under_point: p |> RTuple.sub(over_under_diff),
       reflectv: ray |> Ray.reflect(final_normal_v),
       n1: n1,
       n2: n2

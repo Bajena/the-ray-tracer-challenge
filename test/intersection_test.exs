@@ -117,4 +117,16 @@ defmodule IntersectionTest do
       assert comps.n2 == n2
     end
   end
+
+  test "The under point is offset below the surface" do
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+    s = Sphere.glass_sphere() |> Shape.set_transform(Transformations.translation(0, 0, 1))
+
+    i = Intersection.new(5, s)
+    comps = prepare_computations(i, r)
+
+    upz = comps.under_point |> RTuple.z
+    assert upz > epsilon() / 2
+    assert comps.point |> RTuple.z < upz
+  end
 end
