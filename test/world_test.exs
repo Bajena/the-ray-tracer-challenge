@@ -10,6 +10,7 @@ defmodule WorldTest do
   alias RayTracer.Ray
   alias RayTracer.Light
   alias RayTracer.Intersection
+  alias RayTracer.TestPattern
 
   import RayTracer.RTuple.CustomOperators
   import RTuple, only: [point: 3, vector: 3]
@@ -201,5 +202,87 @@ defmodule WorldTest do
     i = Intersection.new(:math.sqrt(2), shape)
     comps = Intersection.prepare_computations(i, r)
     assert World.reflected_color(w, comps, 0) == Color.black
+  end
+
+  test "The refracted color with an opaque surface" do
+    w = World.default()
+    shape = Enum.at(w.objects, 0)
+
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+
+    xs = Intersection.intersections([
+      {4, shape},
+      {6, shape}
+    ])
+    i = Enum.at(xs, 0)
+    comps = Intersection.prepare_computations(i, r, xs)
+    assert World.refracted_color(w, comps) == Color.black
+  end
+
+  test "The refracted color at the maximum recursive depth" do
+    w = World.default()
+    shape = Enum.at(w.objects, 0)
+
+    shape = put_in(shape.material.transparency, 0.5)
+    shape = put_in(shape.material.refractive_index, 1.5)
+    w = put_in(w.objects, w.objects |> List.replace_at(0, shape))
+
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+
+    xs = Intersection.intersections([
+      {4, shape},
+      {6, shape}
+    ])
+    i = Enum.at(xs, 0)
+    comps = Intersection.prepare_computations(i, r, xs)
+    assert World.refracted_color(w, comps, 0) == Color.black
+  end
+
+  test "The refracted color under total internal reflection" do
+    w = World.default()
+    shape = Enum.at(w.objects, 0)
+
+    shape = put_in(shape.material.transparency, 0.5)
+    shape = put_in(shape.material.refractive_index, 1.5)
+    w = put_in(w.objects, w.objects |> List.replace_at(0, shape))
+
+    r = Ray.new(point(0, 0, :math.sqrt(2) / 2), vector(0, 1, 0))
+
+    xs = Intersection.intersections([
+      {-:math.sqrt(2) / 2, shape},
+      {:math.sqrt(2) / 2, shape}
+    ])
+
+    # NOTE: this time you're inside the sphere, so you need
+    # to look at the second intersection, xs[1], not xs[0]
+    i = Enum.at(xs, 1)
+    comps = Intersection.prepare_computations(i, r, xs)
+    assert World.refracted_color(w, comps) == Color.black
+  end
+
+  test "The refracted color with a refracted ray" do
+    w = World.default()
+    a = Enum.at(w.objects, 0)
+    a = put_in(a.material.ambient, 1)
+    a = put_in(a.material.pattern, %TestPattern{})
+
+    b = Enum.at(w.objects, 0)
+    b = put_in(b.material.transparency, 1)
+    b = put_in(b.material.refractive_index, 1.5)
+
+    w = put_in(w.objects, [a, b])
+
+    r = Ray.new(point(0, 0, 0.1), vector(0, 1, 0))
+
+    xs = Intersection.intersections([
+      {-0.9899, a},
+      {-0.4899, b},
+      {0.4899, b},
+      {0.9899, a}
+    ])
+
+    i = Enum.at(xs, 2)
+    comps = Intersection.prepare_computations(i, r, xs)
+    assert World.refracted_color(w, comps) <~> Color.new(0, 0.99887, 0.04722)
   end
 end

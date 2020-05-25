@@ -76,8 +76,56 @@ defmodule RayTracer.World do
     )
 
     reflected = world |> reflected_color(comps, remaining)
+    refracted = world |> refracted_color(comps, remaining)
 
-    Color.add(surface, reflected)
+    surface
+    |> Color.add(reflected)
+    |> Color.add(refracted)
+  end
+
+  @doc """
+  Computes a color when refraction occurs (hit at the border of two materials
+  with different refraction indices - e.g. glass and air)
+
+  t - angle of
+  """
+  @spec refracted_color(t, Intersection.computation, integer) :: Color.t
+  def refracted_color(_, _, remaining \\ 4)
+  def refracted_color(_, _, 0), do: Color.black
+  def refracted_color(_, %{object: %{material: %{transparency: transparency }}}, _) when transparency == 0, do: Color.black
+  def refracted_color(world, comps, remaining) do
+    # Find the ratio of first index of refraction to the second.
+    # (Yup, this is inverted from the definition of Snell's Law.)
+    n_ratio = comps.n1 / comps.n2
+
+    # cos(theta_i) is the same as the dot product of the two vectors
+    cos_i = RTuple.dot(comps.eyev, comps.normalv)
+
+    # Find sin(theta_t)^2 via trigonometric identity
+    sin2_t = n_ratio * n_ratio * (1 - cos_i * cos_i)
+
+    if sin2_t > 1 do
+      # We have a total internal reflection here, light won't escape
+      Color.black
+    else
+      cos_t = :math.sqrt(1 - sin2_t)
+
+      # Compute the direction of the refracted ray
+      direction =
+        RTuple.sub(
+          comps.normalv |> RTuple.mul(n_ratio * cos_i - cos_t),
+          comps.eyev |> RTuple.mul(n_ratio)
+        )
+
+      # Create the refracted ray
+      refract_ray = Ray.new(comps.under_point, direction)
+
+      # Find the color of the refracted ray, making sure to multiply by
+      # the transparency value to account for any opacity.
+      world
+      |> color_at(refract_ray, remaining - 1)
+      |> Color.mul(comps.object.material.transparency)
+    end
   end
 
   @doc """
