@@ -87,7 +87,8 @@ defmodule RayTracer.World do
   Computes a color when refraction occurs (hit at the border of two materials
   with different refraction indices - e.g. glass and air)
 
-  t - angle of
+  t - angle of incoming ray
+  i - angle of refracted ray
   """
   @spec refracted_color(t, Intersection.computation, integer) :: Color.t
   def refracted_color(_, _, remaining \\ 4)

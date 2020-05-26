@@ -285,4 +285,25 @@ defmodule WorldTest do
     comps = Intersection.prepare_computations(i, r, xs)
     assert World.refracted_color(w, comps) <~> Color.new(0, 0.99887, 0.04722)
   end
+
+  test "shade_hit() with a transparent material" do
+    floor = put_in(%Plane{}.material.transparency, 0.5) |> Shape.set_transform(translation(0, -1, 0))
+    floor = put_in(floor.material.refractive_index, 1.5)
+
+    ball = put_in(%Sphere{}.material.ambient, 0.5) |> Shape.set_transform(translation(0, -3.5, -0.5))
+    ball = put_in(ball.material.color, Color.new(1, 0, 0))
+
+    w = World.default()
+    w = put_in(
+      w.objects,
+      w.objects |> List.insert_at(-1, floor) |> List.insert_at(-1, ball)
+    )
+
+    r = Ray.new(point(0, 0, -3), vector(0, -:math.sqrt(2) / 2, :math.sqrt(2) / 2))
+    i = Intersection.new(:math.sqrt(2), floor)
+    comps = i |> Intersection.prepare_computations(r, [i])
+    c = w |> World.shade_hit(comps)
+
+    assert c <~> Color.new(0.93643, 0.68643, 0.68643)
+  end
 end

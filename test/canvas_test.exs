@@ -46,6 +46,7 @@ defmodule CanvasTest do
     assert String.ends_with?(r, "\n") # Must end with a newline
   end
 
+  @tag :skip
   test "Splitting long lines in PPM files" do
     color = Color.new(1, 0.8, 0.6)
     c = Canvas.new(10, 2, color)

@@ -136,7 +136,12 @@ defmodule RayTracer.Intersection do
 
     n2_new = calc_new_n(n2, i, intersection, containers_new)
 
-    comp_n1_n2(intersection, rest_xs, n1_new, n2_new, containers_new)
+    if i == intersection do
+      # Break here, we don't need to compute any more n values
+      {n1_new, n2_new}
+    else
+      comp_n1_n2(intersection, rest_xs, n1_new, n2_new, containers_new)
+    end
   end
 
   defp calc_new_n(current_n, i, intersection, containers) do
