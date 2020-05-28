@@ -47,7 +47,7 @@ defmodule RayTracer.World do
   Computes shading for a ray hitting a world
   """
   @spec color_at(t, Ray.t, integer) :: Color.t
-  def color_at(world, ray, remaining \\ 4) do
+  def color_at(world, ray, remaining \\ 5) do
     xs = world |> Intersection.intersect_world(ray)
 
     hit = xs |> Intersection.hit()
@@ -64,9 +64,10 @@ defmodule RayTracer.World do
   Shades an intersection
   """
   @spec shade_hit(t, Intersection.computation, integer) :: Color.t
-  def shade_hit(world, comps, remaining \\ 4) do
+  def shade_hit(world, comps, remaining \\ 5) do
+    material = comps.object.material
     surface = Light.lighting(
-      comps.object.material,
+      material,
       comps.object,
       world.light,
       comps.over_point,
@@ -76,15 +77,72 @@ defmodule RayTracer.World do
     )
 
     reflected = world |> reflected_color(comps, remaining)
+    refracted = world |> refracted_color(comps, remaining)
 
-    Color.add(surface, reflected)
+    if material.reflective > 0 && material.transparency > 0 do
+      reflectance = Intersection.schlick(comps)
+
+      surface
+      |> Color.add(reflected |> Color.mul(reflectance))
+      |> Color.add(refracted |> Color.mul(1 - reflectance))
+    else
+      surface
+      |> Color.add(reflected)
+      |> Color.add(refracted)
+    end
+  end
+
+  @doc """
+  Computes a color when refraction occurs (hit at the border of two materials
+  with different refraction indices - e.g. glass and air)
+
+  t - angle of incoming ray
+  i - angle of refracted ray
+  """
+  @spec refracted_color(t, Intersection.computation, integer) :: Color.t
+  def refracted_color(_, _, remaining \\ 5)
+  def refracted_color(_, _, 0), do: Color.black
+  def refracted_color(_, %{object: %{material: %{transparency: transparency }}}, _) when transparency == 0, do: Color.black
+  def refracted_color(world, comps, remaining) do
+    # Find the ratio of first index of refraction to the second.
+    # (Yup, this is inverted from the definition of Snell's Law.)
+    n_ratio = comps.n1 / comps.n2
+
+    # cos(theta_i) is the same as the dot product of the two vectors
+    cos_i = RTuple.dot(comps.eyev, comps.normalv)
+
+    # Find sin(theta_t)^2 via trigonometric identity
+    sin2_t = n_ratio * n_ratio * (1 - cos_i * cos_i)
+
+    if sin2_t > 1 do
+      # We have a total internal reflection here, light won't escape
+      Color.black
+    else
+      cos_t = :math.sqrt(1 - sin2_t)
+
+      # Compute the direction of the refracted ray
+      direction =
+        RTuple.sub(
+          comps.normalv |> RTuple.mul(n_ratio * cos_i - cos_t),
+          comps.eyev |> RTuple.mul(n_ratio)
+        )
+
+      # Create the refracted ray
+      refract_ray = Ray.new(comps.under_point, direction)
+
+      # Find the color of the refracted ray, making sure to multiply by
+      # the transparency value to account for any opacity.
+      world
+      |> color_at(refract_ray, remaining - 1)
+      |> Color.mul(comps.object.material.transparency)
+    end
   end
 
   @doc """
   Computes a color for reflection
   """
   @spec reflected_color(t, Intersection.computation, integer) :: Color.t
-  def reflected_color(_, _, remaining \\ 4)
+  def reflected_color(_, _, remaining \\ 5)
   def reflected_color(_, _, 0), do: Color.black
   def reflected_color(_, %{object: %{material: %{reflective: r }}}, _) when r == 0, do: Color.black
   def reflected_color(world, comps, remaining) do

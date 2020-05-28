@@ -24,6 +24,7 @@ defmodule RayTracer.Intersection do
     eyev: RTuple.vector,
     normalv: RTuple.vector,
     inside: boolean,
+    under_point: RTuple.point,
     over_point: RTuple.point,
     reflectv: RTuple.vector,
     n1: number,
@@ -95,6 +96,7 @@ defmodule RayTracer.Intersection do
     final_normal_v = (if inside, do: RTuple.negate(normalv), else: normalv)
 
     {n1, n2} = intersection |> comp_n1_n2(xs)
+    over_under_diff = final_normal_v |> RTuple.mul(epsilon())
 
     %{
       t: intersection.t,
@@ -103,11 +105,43 @@ defmodule RayTracer.Intersection do
       eyev: eyev,
       normalv: final_normal_v,
       inside: inside,
-      over_point: p |> RTuple.add(final_normal_v |> RTuple.mul(epsilon())),
+      over_point: p |> RTuple.add(over_under_diff),
+      under_point: p |> RTuple.sub(over_under_diff),
       reflectv: ray |> Ray.reflect(final_normal_v),
       n1: n1,
       n2: n2
     }
+  end
+
+  @doc """
+  Computes reflectance (the amount of reflected light)
+  Returns Schlick's approximation of Fresnel's equation
+  """
+  @spec schlick(computation) :: number
+  def schlick(comps) do
+    cos = RTuple.dot(comps.eyev, comps.normalv)
+
+    # Total internal reflection can occur only if n1 > n2
+    if comps.n1 > comps.n2 do
+      n = comps.n1 / comps.n2
+      sin2_t = n * n * (1.0 - cos * cos)
+
+      if sin2_t > 1.0 do
+        1.0
+      else
+        cos_t = :math.sqrt(1 - sin2_t)
+
+        # When n1 > n2 use cos(theta_t) instead
+        calc_schlick(comps, cos_t)
+      end
+    else
+      calc_schlick(comps, cos)
+    end
+  end
+
+  defp calc_schlick(comps, cos) do
+    r0 = ((comps.n1 - comps.n2) / (comps.n1 + comps.n2)) |> :math.pow(2)
+    r0 + (1 - r0) * :math.pow(1 - cos, 5)
   end
 
   # Tests if the intersection occured inside the object
@@ -132,7 +166,12 @@ defmodule RayTracer.Intersection do
 
     n2_new = calc_new_n(n2, i, intersection, containers_new)
 
-    comp_n1_n2(intersection, rest_xs, n1_new, n2_new, containers_new)
+    if i == intersection do
+      # Break here, we don't need to compute any more n values
+      {n1_new, n2_new}
+    else
+      comp_n1_n2(intersection, rest_xs, n1_new, n2_new, containers_new)
+    end
   end
 
   defp calc_new_n(current_n, i, intersection, containers) do

@@ -8,9 +8,10 @@ defmodule IntersectionTest do
   alias RayTracer.Transformations
 
   import RTuple, only: [point: 3, vector: 3]
-  import Intersection, only: [prepare_computations: 2, prepare_computations: 3, intersections: 1]
+  import Intersection, only: [prepare_computations: 2, prepare_computations: 3, intersections: 1, schlick: 1]
   import RayTracer.Constants
   import Transformations, only: [scaling: 3, translation: 3]
+  import RayTracer.General
 
   use ExUnit.Case
   doctest RayTracer.Intersection
@@ -116,5 +117,59 @@ defmodule IntersectionTest do
       assert comps.n1 == n1
       assert comps.n2 == n2
     end
+  end
+
+  test "The under point is offset below the surface" do
+    r = Ray.new(point(0, 0, -5), vector(0, 0, 1))
+    s = Sphere.glass_sphere() |> Shape.set_transform(Transformations.translation(0, 0, 1))
+
+    i = Intersection.new(5, s)
+    comps = prepare_computations(i, r)
+
+    upz = comps.under_point |> RTuple.z
+    assert upz > epsilon() / 2
+    assert comps.point |> RTuple.z < upz
+  end
+
+  test "The Schlick approximation under total internal reflection" do
+    r = Ray.new(point(0, 0, :math.sqrt(2) / 2), vector(0, 1, 0))
+    s = Sphere.glass_sphere()
+    xs = intersections([
+      {-:math.sqrt(2) / 2, s}, {:math.sqrt(2) / 2, s}
+    ])
+
+    i = Enum.at(xs, 1)
+    comps = prepare_computations(i, r, xs)
+
+    reflectance = schlick(comps)
+    assert reflectance == 1.0
+  end
+
+  test "The Schlick approximation with a perpendicular viewing angle" do
+    r = Ray.new(point(0, 0, 0), vector(0, 1, 0))
+    s = Sphere.glass_sphere()
+    xs = intersections([
+      {-1, s}, {1, s}
+    ])
+
+    i = Enum.at(xs, 1)
+    comps = prepare_computations(i, r, xs)
+
+    reflectance = schlick(comps)
+    assert round_eps(reflectance) == 0.04
+  end
+
+  test "The Schlick approximation with small angle and n2 > n1" do
+    r = Ray.new(point(0, 0.99, -2), vector(0, 0, 1))
+    s = Sphere.glass_sphere()
+    xs = intersections([
+      {1.8589, s}
+    ])
+
+    i = Enum.at(xs, 0)
+    comps = prepare_computations(i, r, xs)
+
+    reflectance = schlick(comps)
+    assert round_eps(reflectance) == 0.48873
   end
 end
