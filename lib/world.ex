@@ -47,7 +47,7 @@ defmodule RayTracer.World do
   Computes shading for a ray hitting a world
   """
   @spec color_at(t, Ray.t, integer) :: Color.t
-  def color_at(world, ray, remaining \\ 4) do
+  def color_at(world, ray, remaining \\ 5) do
     xs = world |> Intersection.intersect_world(ray)
 
     hit = xs |> Intersection.hit()
@@ -64,9 +64,10 @@ defmodule RayTracer.World do
   Shades an intersection
   """
   @spec shade_hit(t, Intersection.computation, integer) :: Color.t
-  def shade_hit(world, comps, remaining \\ 4) do
+  def shade_hit(world, comps, remaining \\ 5) do
+    material = comps.object.material
     surface = Light.lighting(
-      comps.object.material,
+      material,
       comps.object,
       world.light,
       comps.over_point,
@@ -78,9 +79,17 @@ defmodule RayTracer.World do
     reflected = world |> reflected_color(comps, remaining)
     refracted = world |> refracted_color(comps, remaining)
 
-    surface
-    |> Color.add(reflected)
-    |> Color.add(refracted)
+    if material.reflective > 0 && material.transparency > 0 do
+      reflectance = Intersection.schlick(comps)
+
+      surface
+      |> Color.add(reflected |> Color.mul(reflectance))
+      |> Color.add(refracted |> Color.mul(1 - reflectance))
+    else
+      surface
+      |> Color.add(reflected)
+      |> Color.add(refracted)
+    end
   end
 
   @doc """
@@ -91,7 +100,7 @@ defmodule RayTracer.World do
   i - angle of refracted ray
   """
   @spec refracted_color(t, Intersection.computation, integer) :: Color.t
-  def refracted_color(_, _, remaining \\ 4)
+  def refracted_color(_, _, remaining \\ 5)
   def refracted_color(_, _, 0), do: Color.black
   def refracted_color(_, %{object: %{material: %{transparency: transparency }}}, _) when transparency == 0, do: Color.black
   def refracted_color(world, comps, remaining) do
@@ -133,7 +142,7 @@ defmodule RayTracer.World do
   Computes a color for reflection
   """
   @spec reflected_color(t, Intersection.computation, integer) :: Color.t
-  def reflected_color(_, _, remaining \\ 4)
+  def reflected_color(_, _, remaining \\ 5)
   def reflected_color(_, _, 0), do: Color.black
   def reflected_color(_, %{object: %{material: %{reflective: r }}}, _) when r == 0, do: Color.black
   def reflected_color(world, comps, remaining) do

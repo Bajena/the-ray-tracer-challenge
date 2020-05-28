@@ -8,6 +8,7 @@ defmodule CameraTest do
   alias RayTracer.Color
 
   import RTuple.CustomOperators
+  import RayTracer.General
   import RTuple, only: [point: 3, vector: 3]
   import Transformations, only: [rotation_y: 1, translation: 3, view_transform: 3]
 
@@ -26,13 +27,13 @@ defmodule CameraTest do
   test "The pixel size for a horizontal canvas" do
     c = Camera.new(200, 125, :math.pi / 2)
 
-    assert c.pixel_size |> Float.round(5) == 0.01
+    assert c.pixel_size |> round_eps == 0.01
   end
 
   test "The pixel size for a vertical canvas" do
     c = Camera.new(200, 125, :math.pi / 2)
 
-    assert c.pixel_size |> Float.round(5) == 0.01
+    assert c.pixel_size |> round_eps == 0.01
   end
 
   test "Constructing a ray through the center of the canvas" do
@@ -52,7 +53,10 @@ defmodule CameraTest do
   end
 
   test "Constructing a ray when the camera is transformed" do
-    t = rotation_y(:math.pi / 4) |> Matrix.mult(translation(0, -2, 5))
+    t = Transformations.compose([
+      translation(0, -2, 5),
+      rotation_y(:math.pi / 4)
+    ])
     c = Camera.new(201, 101, :math.pi / 2, t)
     r = c |> Camera.ray_for_pixel(100, 50)
 

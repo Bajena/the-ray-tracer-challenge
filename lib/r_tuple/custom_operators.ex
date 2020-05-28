@@ -4,6 +4,7 @@ defmodule RayTracer.RTuple.CustomOperators do
   """
 
   import RayTracer.RTuple.Helpers
+  import RayTracer.General
   alias RayTracer.RTuple
 
   @doc """
@@ -12,7 +13,7 @@ defmodule RayTracer.RTuple.CustomOperators do
   """
   @spec RTuple.t <~> RTuple.t :: boolean
   def a <~> b do
-    round = &(&1 |> :erlang.float |> Float.round(5))
+    round = &(&1 |> round_eps)
     map(a, round) == map(b, round)
   end
 end

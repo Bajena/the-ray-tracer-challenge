@@ -112,4 +112,10 @@ defmodule RayTracer.Transformations do
 
     orientation |> Matrix.mult(translate_from)
   end
+
+  def compose(transformations) do
+    transformations
+    |> Enum.reverse
+    |> Enum.reduce(fn x, acc -> acc |> Matrix.mult(x) end)
+  end
 end
