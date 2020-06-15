@@ -19,6 +19,7 @@ defmodule RayTracer.Cube do
   }
 
   import RayTracer.Constants
+  import RTuple, only: [vector: 3]
 
   @doc """
   Builds a cube with given transformation matrix and material
@@ -32,8 +33,17 @@ defmodule RayTracer.Cube do
     alias RayTracer.{Cube, RTuple, Intersection, Ray}
 
     @spec local_normal_at(Cube.t, RTuple.point) :: RTuple.vector
-    def local_normal_at(_plane, _) do
-      # RTuple.vector(0, 1, 0)
+    def local_normal_at(_cube, point) do
+      absv = point.values |> Enum.map(fn v -> abs(v) end)
+      maxc = absv |> Enum.max
+      x = Enum.at(absv, 0)
+      y = Enum.at(absv, 1)
+
+      cond do
+        maxc == x -> vector(point |> RTuple.x, 0, 0)
+        maxc == y -> vector(0, point |> RTuple.y, 0)
+        true -> vector(0, 0, point |> RTuple.z)
+      end
     end
 
     @spec local_intersect(Cube.t, Ray.t) :: list(Intersection.t)
@@ -47,7 +57,11 @@ defmodule RayTracer.Cube do
       tmin = Enum.max([xtmin, ytmin, ztmin])
       tmax = Enum.min([xtmax, ytmax, ztmax])
 
-      [Intersection.new(tmin, cube), Intersection.new(tmax, cube)]
+      if tmin > tmax do
+        []
+      else
+        [Intersection.new(tmin, cube), Intersection.new(tmax, cube)]
+      end
     end
 
     @spec check_axis(number, number) :: {number, number}
@@ -59,20 +73,20 @@ defmodule RayTracer.Cube do
         tmin = tmin_numerator / direction
         tmax = tmax_numerator / direction
 
-        if tmin > tmax do
-          {tmax, tmin}
-        else
-          {tmin, tmax}
-        end
+        swap_if_greater(tmin, tmax)
       else
         tmin = tmin_numerator * infinity()
         tmax = tmax_numerator * infinity()
 
-        if tmin > tmax do
-          {tmax, tmin}
-        else
-          {tmin, tmax}
-        end
+        swap_if_greater(tmin, tmax)
+      end
+    end
+
+    defp swap_if_greater(tmin, tmax) do
+      if tmin > tmax do
+        {tmax, tmin}
+      else
+        {tmin, tmax}
       end
     end
   end
