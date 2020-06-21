@@ -34,24 +34,26 @@ defmodule RayTracer.Cube do
 
     @spec local_normal_at(Cube.t, RTuple.point) :: RTuple.vector
     def local_normal_at(_cube, point) do
-      absv = point.values |> Enum.map(fn v -> abs(v) end)
+      ox = point |> RTuple.x
+      oy = point |> RTuple.y
+      oz = point |> RTuple.z
+
+      absv = [ox, oy, oz] |> Enum.map(fn v -> abs(v) end)
       maxc = absv |> Enum.max
       x = Enum.at(absv, 0)
       y = Enum.at(absv, 1)
 
       cond do
-        maxc == x -> vector(point |> RTuple.x, 0, 0)
-        maxc == y -> vector(0, point |> RTuple.y, 0)
-        true -> vector(0, 0, point |> RTuple.z)
+        maxc == x -> vector(ox, 0, 0)
+        maxc == y -> vector(0, oy, 0)
+        true -> vector(0, 0, oz)
       end
     end
 
     @spec local_intersect(Cube.t, Ray.t) :: list(Intersection.t)
     def local_intersect(cube, ray) do
       {xtmin, xtmax} = check_axis(ray.origin |> RTuple.x, ray.direction |> RTuple.x)
-
       {ytmin, ytmax} = check_axis(ray.origin |> RTuple.y, ray.direction |> RTuple.y)
-
       {ztmin, ztmax} = check_axis(ray.origin |> RTuple.z, ray.direction |> RTuple.z)
 
       tmin = Enum.max([xtmin, ytmin, ztmin])
