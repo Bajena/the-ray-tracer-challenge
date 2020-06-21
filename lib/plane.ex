@@ -21,7 +21,7 @@ defmodule RayTracer.Plane do
   import RayTracer.Constants
 
   @doc """
-  Builds a sphere with given `center`, radius `r` and transformation matrix
+  Builds a plane with given transformation matrix and material
   """
   @spec new(Matrix.matrix, Material.t) :: t
   def new(transform \\ Matrix.ident, material \\ Material.new) do

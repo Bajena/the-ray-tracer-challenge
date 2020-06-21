@@ -18,7 +18,7 @@ This repo is an implementation of [The Ray Tracer Challenge by Jamis Buck](https
 - ✅ Chapter 9: [Planes](https://user-images.githubusercontent.com/5732023/80920094-e3249a80-8d6d-11ea-895b-a8de0a634e22.png)
 - ✅ Chapter 10: [Patterns](https://user-images.githubusercontent.com/5732023/81510282-eccf7480-9310-11ea-8a9b-cbc3bb418a42.png)
 - ✅ Chapter 11: [Reflection](https://user-images.githubusercontent.com/5732023/82288562-0cb30800-99a3-11ea-87aa-0b4bec2bf7bc.png) and [Refraction](https://user-images.githubusercontent.com/5732023/83182446-a8bcdc00-a126-11ea-945f-81dbe167a820.png)
-- Chapter 12: Cubes
+- ✅ Chapter 12: [Cubes](https://user-images.githubusercontent.com/5732023/85230128-5f427280-b3ee-11ea-997b-4483dc9b7b41.png)
 - Chapter 13: Cylinders
 - Chapter 14: Groups
 - Chapter 15: Triangles
