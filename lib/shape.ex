@@ -26,7 +26,7 @@ defmodule RayTracer.Shape do
     end
   end
 
-  @type t :: RayTracer.Sphere.t | RayTracer.Plane.t | RTuple.Cube.t
+  @type t :: RayTracer.Sphere.t | RayTracer.Plane.t | RayTracer.Cube.t
 
   @spec normal_at(t, RTuple.point) :: RTuple.vector
   def normal_at(shape, p) do
